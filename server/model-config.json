@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "sources": [
+      "loopback/common/models",
+      "loopback/server/models",
+      "../common/models",
+      "./models"
+    ]
+  },
+  "User": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "AccessToken": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": false
+  },
+  "ACL": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": false
+  },
+  "RoleMapping": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": false
+  },
+  "Role": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": false
+  },
+  "sound_file_container": {
+    "dataSource": "local_file_system",
+    "public": true
+  },
+  "senz_app": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "Log": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "Installation": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "UserLog": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "pruned_user_log": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "crf_status": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "hmm_status": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "user_status": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  }
+}

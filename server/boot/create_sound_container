@@ -1,0 +1,21 @@
+var path = require("path")
+var loopback = require("loopback");
+
+module.exports = function(app) {
+  /*
+   * The `app` object provides access to a variety of LoopBack resources such as
+   * models (e.g. `app.models.YourModelName`) or data sources (e.g.
+   * `app.datasources.YourDataSource`). See
+   * http://docs.strongloop.com/display/public/LB/Working+with+LoopBack+objects
+   * for more info.
+   */
+  console.log("fuck here")
+  console.log(JSON.stringify(app));
+  var ds = loopback.createDataSource({
+    connector:require("loopback-component-storage"),
+    provider:"filesystem",
+    root:path.join(__dirname,"../../storage")
+  })
+  var container = ds.createModel("sound_container");
+  app.model(container);
+};

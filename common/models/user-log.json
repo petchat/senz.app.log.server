@@ -1,0 +1,52 @@
+{
+  "name": "UserLog",
+  "plural": "UserLogs",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "poiProbLv2": {
+      "type": "object"
+    },
+    "poiProbLv1": {
+      "type": "object"
+    },
+    "type": {
+      "type": "string",
+      "required": true
+    },
+    "soundProb": {
+      "type": "object"
+    },
+    "motionProb": {
+      "type": "object"
+    },
+    "timestamp": {
+      "type": "number",
+      "required": true
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "updatedAt": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "raw_log": {
+      "type": "belongsTo",
+      "model": "Log",
+      "foreignKey": ""
+    },
+    "user": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": []
+}

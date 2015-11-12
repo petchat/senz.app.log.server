@@ -1,0 +1,40 @@
+{
+  "name": "Installation",
+  "plural": "Installations",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "hardwareId": {
+      "type": "string",
+      "required": true
+    },
+    "deviceType": {
+      "type": "string",
+      "required": true
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "updatedAt": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "user": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": ""
+    },
+    "app": {
+      "type": "belongsTo",
+      "model": "senz_app",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": []
+}

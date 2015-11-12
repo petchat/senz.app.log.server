@@ -1,0 +1,28 @@
+{
+    "name": "Senz-Log-Hooker",
+    "description": "get all the services smooth",
+    "version": "0.0.1",
+    "private": true,
+    "dependencies": {
+        "underscore":"",
+        "wascally"     : "latest",
+        "memory-cache" : "",
+        "tracer" : "",
+        "node-logentries": "0.0.2",
+        "express": "3.x",
+        "jsonfile": "",
+        "forever":"",
+        "forever-monitor":"",
+        "avoscloud-sdk": "",
+        "rollbar":"",
+        "request":"",
+        "simplesets":"",
+        "supertest":"",
+        "should":"",
+        "body-parser":"",
+        "node-schedule":"",
+        "uuid":"",
+        "bugsnag":""
+    }
+
+}

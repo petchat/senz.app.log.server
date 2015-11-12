@@ -1,0 +1,39 @@
+<html>
+<head>
+  <script src="https://cdn.wilddog.com/js/client/current/wilddog.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+</head>
+<body>
+<div> Context </div>
+<div id="context"></div>
+<div> Behavior </div>
+<div id="behavior"></div>
+
+<script>
+  var myDataRef = new Wilddog("https://hengyang.wilddogio.com/559e76e746a022f241c300ff/context");
+  var myDataRef2 = new Wilddog("https://hengyang.wilddogio.com/559e76e746a022f241c300ff/behavior");
+  myDataRef.on("child_added", function(snapshot) {
+
+
+    var message = snapshot.val();
+    displayChatMessage(message);
+  });
+
+  myDataRef2.on("child_added", function(snapshot) {
+
+    var message = snapshot.val();
+    displayChatMessage(message);
+  });
+
+
+  function displayChatMessage2(msg) {
+    $("#behaovior").text(JSON.stringify(msg));
+  };
+
+  function displayChatMessage(msg) {
+    $("#context").text(JSON.stringify(msg));
+  };
+
+</script>
+</body>
+</html>

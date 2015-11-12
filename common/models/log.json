@@ -1,0 +1,58 @@
+{
+  "name": "Log",
+  "plural": "Logs",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "value": {
+      "type": "object"
+    },
+    "type": {
+      "type": "string",
+      "required": true
+    },
+    "source": {
+      "type": "string"
+    },
+    "locationRadius": {
+      "type": "number"
+    },
+    "timestamp": {
+      "type": "number",
+      "required": true
+    },
+    "location": {
+      "type": "geopoint"
+    },
+    "file": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "date"
+    },
+    "updateAt": {
+      "type": "date"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "installation": {
+      "type": "belongsTo",
+      "model": "Installation",
+      "foreignKey": ""
+    },
+    "user": {
+      "type": "belongsTo",
+      "model": "User",
+      "foreignKey": ""
+    }
+  },
+  "acls": [],
+  "methods": []
+}
