@@ -5,9 +5,19 @@
       "loopback/server/models",
       "../common/models",
       "./models"
+    ],
+    "mixins": [
+      "loopback/common/mixins",
+      "loopback/server/mixins",
+      "../common/mixins",
+      "./mixins"
     ]
   },
   "User": {
+    "dataSource": "qingcloud1-mongodb",
+    "public": true
+  },
+  "Tracker": {
     "dataSource": "qingcloud1-mongodb",
     "public": true
   },
@@ -51,15 +61,7 @@
     "dataSource": "qingcloud1-mongodb",
     "public": true
   },
-  "crf_status": {
-    "dataSource": "qingcloud1-mongodb",
-    "public": true
-  },
-  "hmm_status": {
-    "dataSource": "qingcloud1-mongodb",
-    "public": true
-  },
-  "user_status": {
+  "test": {
     "dataSource": "qingcloud1-mongodb",
     "public": true
   }

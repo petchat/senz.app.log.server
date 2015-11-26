@@ -6,6 +6,7 @@
   "options": {
     "validateUpsert": true
   },
+  "mixins": {"Timestamp": true},
   "properties": {
     "hardwareId": {
       "type": "string",
@@ -36,5 +37,5 @@
     }
   },
   "acls": [],
-  "methods": []
+  "methods": {}
 }

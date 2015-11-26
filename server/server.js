@@ -25,3 +25,19 @@ boot(app, __dirname, function(err) {
   if (require.main === module)
     app.start();
 });
+
+//app.use('/test1', function(req, res, next){
+//  console.log(req.params);
+//  console.log('test form "catch-all" route');
+//  next();
+//});
+
+app.post('/test1', function(req, res, next){
+  console.log(req.json);
+  res.send("hello from `test1` route")
+});
+
+app.post('/test2', function(req, res, next){
+  console.log(req.params);
+  res.send(req);
+});
