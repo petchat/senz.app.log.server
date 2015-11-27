@@ -27,12 +27,13 @@ module.exports = function(Log) {
         compressed = ctx.instance.compressed;
 
     if( pre_type == "location" && pre_source == "internal"){
+        var backup_location = {"lat":pre_location.latitude, "lng":pre_location.longitude};
         var c_location = converter.toBaiduCoordinate(pre_location.lng, pre_location.lat);
-        source = "baidu offline converter";
-        var location = pre_location;
+        var source = "baidu offline converter";
 
         ctx.instance.location = {"lat": c_location.lat, "lng": c_location.lng};
-        ctx.instance.source = source
+        ctx.instance.source = source;
+        ctx.instance.pre_location = backup_location;
     }
     if ( (pre_type == "accSensor" || pre_type ==  "magneticSensor" || pre_type == "sensor")
         && (compressed == "gzip" || compressed == "gzipped") ){
@@ -70,6 +71,8 @@ module.exports = function(Log) {
                     url += 'ForTests';
                 break;
                 case "location":
+                    var installation_object_id = ctx.instance.id;
+                    console.log(installation_object_id);
                     url += 'UserLocatins';
                 break;
                 case "calendar":
@@ -93,7 +96,7 @@ module.exports = function(Log) {
                 console.log(body);
             });
         }else{
-            console.log("updated %s",ctx.Model.pluralModelName)
+            console.log("updated %s", ctx.Model.pluralModelName)
         }
         next();
     })
