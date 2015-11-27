@@ -73,6 +73,7 @@ module.exports = function(Log) {
                 case "location":
                     var installation_object_id = ctx.instance.id;
                     console.log(installation_object_id);
+
                     url += 'UserLocatins';
                 break;
                 case "calendar":
