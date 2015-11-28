@@ -1,7 +1,7 @@
 var req = require("request");
 var S = require("string");
 var uuid = require("uuid");
-var Promise = require('bluebird');
+//var Promise = require('bluebird');
 var AV = require("avoscloud-sdk").AV;
 
 module.exports = function(Installation) {
@@ -28,8 +28,8 @@ module.exports = function(Installation) {
         var hardwareId = req.body.hardwareId;
         var deviceType = req.body.deviceType;
         console.log("body is ");
-        var user_exists_promise = new AV.Promise()
-        var user_not_exists_promise = new AV.Promise()
+        var user_exists_promise = new AV.Promise();
+        var user_not_exists_promise = new AV.Promise();
         var loopback_app = null;
 
         Installation.getApp(function(err, app){
@@ -72,8 +72,7 @@ module.exports = function(Installation) {
                 }, function(err, models){
                     if(!err){
                         console.log("fuck here");
-                        var response = models;
-                        cb(null,response)
+                        cb(null, models)
                     }
                     else{
                         console.log(err);
@@ -102,9 +101,8 @@ module.exports = function(Installation) {
                               "appId": appid
                           }, function(err, models){
                               if(!err){
-                                var response = models;
                                 //id is installation id
-                                cb(null,response)
+                                cb(null, models)
                               }
                               else{
                                 console.log(err);

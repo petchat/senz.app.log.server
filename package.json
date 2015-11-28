@@ -23,8 +23,10 @@
         "avoscloud-sdk": "",
         "mongodb": "2.0.42",
         "uuid": "",
+        "node-redis": "",
         "bluebird": "",
-        "zlib": ""
+        "underscore": "",
+        "sendcloud":""
     },
     "optionalDependencies": {
         "loopback-explorer": "^1.1.0"
