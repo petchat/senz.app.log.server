@@ -1,28 +1,28 @@
 {
-    "local_file_system": {
-        "name": "local_file_system",
-        "connector": "loopback-component-storage",
-        "provider": "filesystem",
-        "root": "./storage"
-    },
-    "qingcloud1-mongodb": {
-        "host": "119.254.111.40",
-        "port": 27017,
-        "url": "",
-        "database": "senz",
-        "password": "xiaosenz",
-        "name": "qingcloud1-mongodb",
-        "user": "senz",
-        "connector": "mongodb"
-    },
-    "qingcloud_refinedlog": {
-        "host": "119.254.111.40",
-        "port": 27017,
-        "url": "",
-        "database": "RefinedLog",
-        "password": "Senz2everyone",
-        "name": "qingcloud1_refinedlog",
-        "user": "senzhub",
-        "connector": "mongodb"
-    }
+  "local_file_system": {
+    "name": "local_file_system",
+    "connector": "loopback-component-storage",
+    "provider": "filesystem",
+    "root": "./storage"
+  },
+  "qingcloud1-mongodb": {
+    "host": "119.254.111.40",
+    "port": 27017,
+    "url": "",
+    "database": "senz",
+    "password": "xiaosenz",
+    "name": "qingcloud1-mongodb",
+    "user": "senz",
+    "connector": "mongodb"
+  },
+  "qingcloud_refinedlog": {
+    "host": "119.254.111.40",
+    "port": 27017,
+    "url": "",
+    "database": "RefinedLog",
+    "password": "Senz2everyone",
+    "name": "qingcloud_refinedlog",
+    "user": "senzhub",
+    "connector": "mongodb"
+  }
 }

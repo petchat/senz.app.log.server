@@ -1,13 +1,15 @@
 {
-    "name": "Log",
-    "plural": "Logs",
-    "base": "PersistedModel",
-    "idInjection": true,
-    "options": {
+  "name": "Log",
+  "plural": "Logs",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
     "validateUpsert": true
-    },
-    "mixins": {"Timestamp": true},
-    "properties": {
+  },
+  "mixins": {
+    "Timestamp": true
+  },
+  "properties": {
     "value": {
       "type": "object"
     },
@@ -40,9 +42,9 @@
     "updateAt": {
       "type": "date"
     }
-    },
-    "validations": [],
-    "relations": {
+  },
+  "validations": [],
+  "relations": {
     "installation": {
       "type": "belongsTo",
       "model": "Installation",
@@ -53,7 +55,7 @@
       "model": "User",
       "foreignKey": ""
     }
-    },
-    "acls": [],
-    "methods": {}
+  },
+  "acls": [],
+  "methods": {}
 }

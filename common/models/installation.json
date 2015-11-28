@@ -6,7 +6,9 @@
   "options": {
     "validateUpsert": true
   },
-  "mixins": {"Timestamp": true},
+  "mixins": {
+    "Timestamp": true
+  },
   "properties": {
     "hardwareId": {
       "type": "string",
