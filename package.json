@@ -18,7 +18,7 @@
     "loopback-ds-timestamp-mixin": "^3.0.0",
     "wascally": "",
     "tracer": "",
-    "request": "",
+    "request-promise": "",
     "string": "",
     "avoscloud-sdk": "",
     "mongodb": "2.0.42",

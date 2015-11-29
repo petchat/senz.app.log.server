@@ -60,9 +60,5 @@
   "pruned_user_log": {
     "dataSource": "qingcloud1-mongodb",
     "public": true
-  },
-  "test": {
-    "dataSource": "qingcloud1-mongodb",
-    "public": true
   }
 }

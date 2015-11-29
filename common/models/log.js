@@ -4,10 +4,9 @@ var converter = require("../libraries/utils/coordinate_trans.js");
 var alertist = require("../libraries/utils/send_notify.js");
 var process = require("../libraries/utils/process_log.js");
 var zlib = require("zlib");
-var request = require('request');
+var request = require('request-promise');
 var redis = require("node-redis");
 var _ = require("underscore");
-var app = require('../../server/server');
 
 var log_example = {
     "value": {"events": "test"},
@@ -60,31 +59,34 @@ module.exports = function(Log) {
         next();
     });
 
-
-    var deviceType = "";
-    var userId = "";
     Log.observe("after save", function(ctx, next){
         if(ctx.isNewInstance){
             console.log('Saved %s#%s', ctx.Model.modelName, ctx.instance.id);
             Log.getApp(function(err, app){
-                app.models.Installation.findOne({"_id": ctx.instance.installationId}, function(err, object){
-                    if(err){
-                        logger.error('installation', 'invalid installationId');
-                    }else{
-                        logger.debug('devicetype', deviceType);
-                        logger.debug('devicetype', userId);
-                        deviceType = object.deviceType;
-                        userId = object.userId;
+                app.models.Installation.findOne({"id": ctx.instance.installationId},
+                    function(err, installation){
+                        if(err){
+                            logger.error('installation', 'invalid installationId');
+                        }else{
+                            return Promise.resolve({
+                                userId: installation.userId,
+                                deviceType: installation.deviceType
+                            })
+                            .then(
+                                function(dic){
+                                    return process_rawLog(ctx.instance, dic);
+                                },
+                                function(err){
+                                    console.log(err);
+                                    return Promise.reject(err);
+                                }
+                            )
+                        }
                     }
-                })
-            });
-            logger.info('tst', ctx.instance.installationId)
-            logger.info('tst', userId)
-            logger.info('tst', deviceType)
-            process_rawLog(ctx.instance);
-        }else{
-            console.log("updated %s", ctx.Model.pluralModelName)
+                )
+            })
         }
+
         next();
     });
 
@@ -92,18 +94,17 @@ module.exports = function(Log) {
         request.post(
             {
                 url: url,
-                headers:{ 'content-type' : 'application/json'},
-                json: JSON.stringify(object)
-            },
-            function(err, res, body){
-                if(err){
-                    logger.debug('refinedlog', body);
+                json: object
+            })
+            .then(
+                function(body) {
+                    logger.debug('refinedlog', JSON.stringify(body));
                     return Promise.resolve(body);
-                }else {
+                },
+                function(err){
                     return Promise.reject(err);
                 }
-            }
-        )
+            )
     };
 
     var request_static_info = function(params){
@@ -112,7 +113,7 @@ module.exports = function(Log) {
         var uuid = params.userRawdataId;
 
         logger.info(uuid, "static info service post started");
-        request.post(
+        return request.post(
             {
                 url: url,
                 headers:{
@@ -120,27 +121,18 @@ module.exports = function(Log) {
                     "X-senz-Auth": auth_key
                 },
                 json: params
-            },
-            function(err, res, body){
-                if(err != null || (res.statusCode != 200 && res.statusCode != 201 || body.code == 1)){
-                    if(_.has(res, "statusCode")){
-                        logger.debug(uuid,res.statusCode);
-                        logger.error(uuid, body.detail);
-                    }else{
-                        logger.error(uuid,"Response with no statusCode");
-                        logger.error(uuid, body.detail);
-                    }
+            })
+            .then(
+                function(body){
+                    return Promise.resolve(body);
+                },
+                function(err){
                     return Promise.reject("Error is " + err );
-                }else{
-                    var body_str = JSON.stringify(body);
-                    logger.debug(uuid,"Body is " + body_str);
-                    return Promise.resolve("Error is " + err );
                 }
-            }
-        )
+            )
     };
 
-    var process_rawLog = function(object){
+    var process_rawLog = function(object, params){
         var type = object.type;
         var processed_obj = {};
         var url = 'http://119.254.111.40:3000/api/';
@@ -178,30 +170,21 @@ module.exports = function(Log) {
                 url += 'UserCalendars';
                 break;
             case "application":
-                Promise.resolve(userId, deviceType)
-                    .then(
-                    function(userId, deviceType){
-                        var body = {};
-                        if(deviceType == "android"){
-                            body.platform = "Android";
-                        }else if(deviceType == "ios"){
-                            body.platform = "IOS";
-                        }
-                        body.userId = userId;
-                        body.userRawdataId = object.id;
-                        body.applist = object.value.packages;
-                        body.timestamp = object.timestamp;
-                        return request_static_info(body);
-                    },
-                    function(err){
-                        logger.error(object.id, "User Id requested into failure");
-                        return Promise.reject(err);
-                    }
-                ).then(
+                var body = {};
+                if(params.deviceType == "android"){
+                    body.platform = "Android";
+                }else if(params.deviceType == "ios"){
+                    body.platform = "IOS";
+                }
+                body.userId = params.userId;
+                body.userRawdataId = object.id;
+                body.applist = object.value.packages;
+                body.timestamp = object.timestamp;
+                return request_static_info(body)
+                .then(
                     function(staticInfo){
-                        logger.debug(object.id, JSON.stringify(staticInfo));
                         processed_obj.applist = object.value.packages;
-                        processed_obj.user_id = user_id;
+                        processed_obj.user_id = params.userId;
                         processed_obj.staticInfo = staticInfo;
                         processed_obj.timestamp = object.timestamp;
                         processed_obj.userRawdataId = object.id;
@@ -212,11 +195,6 @@ module.exports = function(Log) {
                         logger.error(object.id, "Static info service requested in fail");
                         return Promise.reject(err);
                     }
-                ).catch(
-                    function(err){
-                        logger.error('err', err);
-                        return Promise.reject(err);
-                    }
                 );
                 break;
             default:
@@ -225,14 +203,4 @@ module.exports = function(Log) {
                 break;
         }
     };
-
-    Log.getApp = function(cb){
-        var err = null;
-        var app = Log.app;
-        cb(err, app);
-    };
-
-    Log.remoteMethod(
-        'getApp',{}
-    );
 };
