@@ -3,7 +3,7 @@ var logger = new log("Model Log Hook Module");
 var converter = require("../libraries/utils/coordinate_trans.js");
 var zlib = require("zlib");
 var request = require('request-promise');
-var redis = require("node-redis");
+var redis = require("redis");
 var _ = require("underscore");
 var loopback = require('loopback');
 
@@ -361,4 +361,21 @@ module.exports = function(Log) {
                 }
             )
     };
+
+    var test = function(){
+        //log_cache.sadd('RawLog', 'a');
+        //log_cache.sadd('RawLog', 'c');
+        //log_cache.sadd('RawLog', '1');
+        //log_cache.sadd('RawLog', '2');
+        //log_cache.sadd('RawLog', '3');
+        //log_cache.sadd('RawLog', '4');
+        //log_cache.sadd('RawLog', '5');
+        log_cache.smembers('RawLog', function(e, log_list){
+            log_list.forEach(function(logId){
+                console.log(logId);
+            });
+        });
+    };
+
+    setInterval(test, 1000);
 };

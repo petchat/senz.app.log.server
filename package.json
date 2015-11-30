@@ -24,6 +24,7 @@
     "mongodb": "2.0.42",
     "uuid": "",
     "node-redis": "",
+    "redis": "",
     "bluebird": "",
     "underscore": "",
     "sendcloud": ""
