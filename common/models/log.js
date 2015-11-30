@@ -96,9 +96,10 @@ module.exports = function(Log) {
         var url = 'http://119.254.111.40:3000/api/';
         switch (type)
         {
-            case "accSensor":
             case "sensor":
             case "predictedMotion":
+                break;
+            case "accSensor":
                 pre_obj = {};
                 pre_obj.rawData = object.value.events;
                 pre_obj.objectId = object.id;
@@ -113,8 +114,7 @@ module.exports = function(Log) {
                         function(err){
                             logger.error(object.id, "UserMotion service requested in fail");
                             return Promise.reject(err);
-                        }
-                    );
+                        });
                 break;
             case "mic":
                 url += 'ForTests';
@@ -145,8 +145,7 @@ module.exports = function(Log) {
                         function(err){
                             logger.error(object.id, "UserLocation service requested in fail");
                             return Promise.reject(err);
-                        }
-                    );
+                        });
                 break;
             case "calendar":
                 url += 'UserCalendars';
@@ -193,10 +192,11 @@ module.exports = function(Log) {
             })
             .then(
                 function(body) {
-                    logger.debug('refinedlog', JSON.stringify(body));
+                    logger.debug(object.id, "post RefinedLog success");
                     return Promise.resolve(body);
                 },
                 function(err){
+                    logger.error(object.id, "POST RefinedLog Failed!");
                     return Promise.reject(err);
                 }
             )
@@ -338,8 +338,7 @@ module.exports = function(Log) {
         var url = "https://api.trysenz.com/utils/motion_detector/";
         var uuid = params.objectId;
 
-        logger.debug('motion', JSON.stringify(params));
-
+        logger.debug(uuid, "request motion type");
         return request.post(
             {
                 url: url,
@@ -350,7 +349,6 @@ module.exports = function(Log) {
             })
             .then(
                 function(body){
-                    logger.debug('motion', body);
                     var processed_data = load_motion_data(body);
                     processed_data["timestamp"] = params.timestamp;
                     processed_data["userRawdataId"] = params.objectId;
@@ -359,7 +357,6 @@ module.exports = function(Log) {
                 },
                 function(err){
                     logger.error(uuid, "motion service request error");
-                    logger.error(err);
                     return Promise.reject(err);
                 }
             )
