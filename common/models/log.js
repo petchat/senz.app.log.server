@@ -413,5 +413,5 @@ module.exports = function(Log) {
 
     };
 
-    //setInterval(processing_error, 50000);
+    setInterval(processing_error, 60000);
 };
