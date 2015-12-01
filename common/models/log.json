@@ -35,12 +35,6 @@
     },
     "url": {
       "type": "string"
-    },
-    "createdAt": {
-      "type": "date"
-    },
-    "updateAt": {
-      "type": "date"
     }
   },
   "validations": [],

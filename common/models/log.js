@@ -67,26 +67,34 @@ module.exports = function(Log) {
                         return process_rawLog(dic);
                     },
                     function(err){
-                        console.log(err);
+                        logger.error(ctx.instance.id, "process object failed in after save!");
                         return Promise.reject(err);
-                    }
-                );
-        }
-
+                    })
+                .then(
+                    function(){
+                        logger.info(ctx.instance.id, "process object success in after save!");
+                        return Promise.resolve();
+                    },
+                    function(err){
+                        logger.error(ctx.instance.id, "process object failed in after save!");
+                        log_cache.sadd('RawLog', ctx.instance.id);
+                        return Promise.reject(err);
+                    });
+            }
         next();
     });
 
     var get_user_id = function(LogObj){
-        return Log.app.models.Installation.findOne({"id": LogObj.installationId})
+        return Log.app.models.Installation.findOne({where: {"id": LogObj.installationId}})
             .then(
                 function(installation){
-                    logger.info('get_user_id', 'success');
+                    logger.info('get_user_id', 'LogObj.installationId: ' + LogObj.installationId);
                     return Promise.resolve({userId: installation.userId,
                                             deviceType: installation.deviceType,
                                             logObj: LogObj});
                 },
                 function(err){
-                    logger.error('get_user_id', 'invalid installationId');
+                    logger.error('get_user_id', 'query installation failed!');
                     log_cache.sadd('RawLog', LogObj.id);
                     return Promise.reject(err);
                 }
@@ -103,8 +111,8 @@ module.exports = function(Log) {
         {
             case "sensor":
             case "predictedMotion":
-                break;
             case "accSensor":
+                logger.debug('type', type);
                 pre_obj = {};
                 pre_obj.rawData = object.value.events;
                 pre_obj.objectId = object.id;
@@ -370,9 +378,11 @@ module.exports = function(Log) {
     var processing_error = function(){
         log_cache.smembers('RawLog', function(e, log_list){
             log_list.forEach(function(logId){
+                log_cache.srem('RawLog', logId);
                 return Log.findOne({"id": logId})
                     .then(
                         function(log){
+                            logger.debug('type', log.type);
                             return get_user_id(log);
                         },
                         function(err){
@@ -387,9 +397,14 @@ module.exports = function(Log) {
                             logger.error('processing_err', "catched error after get installation object!");
                             return Promise.reject(err);
                         })
-                    .catch(
+                    .then(
+                        function(){
+                            logger.info('processing_err', "post RefinedLog success!");
+                            return Promise.resolve();
+                        },
                         function(err){
                             logger.error('processing_err', "catched error after post RefinedLog!");
+                            log_cache.sadd('RawLog', logId);
                             return Promise.reject(err);
                         }
                     );
@@ -397,6 +412,7 @@ module.exports = function(Log) {
         });
 
     };
+    //processing_error();
 
-    setInterval(processing_error, 5000);
+    //setInterval(processing_error, 50000);
 };
