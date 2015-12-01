@@ -61,35 +61,40 @@ module.exports = function(Log) {
     Log.observe("after save", function(ctx, next){
         if(ctx.isNewInstance){
             console.log('Saved %s#%s', ctx.Model.modelName, ctx.instance.id);
-            Log.getApp(function(err, app){
-                app.models.Installation.findOne({"id": ctx.instance.installationId},
-                    function(err, installation){
-                        if(err){
-                            logger.error('installation', 'invalid installationId');
-                        }else{
-                            return Promise.resolve({
-                                userId: installation.userId,
-                                deviceType: installation.deviceType
-                            })
-                            .then(
-                                function(dic){
-                                    return process_rawLog(ctx.instance, dic);
-                                },
-                                function(err){
-                                    console.log(err);
-                                    return Promise.reject(err);
-                                }
-                            )
-                        }
+            return get_user_id(ctx.instance)
+                .then(
+                    function(dic){
+                        return process_rawLog(dic);
+                    },
+                    function(err){
+                        console.log(err);
+                        return Promise.reject(err);
                     }
-                )
-            })
+                );
         }
 
         next();
     });
 
-    var process_rawLog = function(object, params){
+    var get_user_id = function(LogObj){
+        return Log.app.models.Installation.findOne({"id": LogObj.installationId})
+            .then(
+                function(installation){
+                    logger.info('get_user_id', 'success');
+                    return Promise.resolve({userId: installation.userId,
+                                            deviceType: installation.deviceType,
+                                            logObj: LogObj});
+                },
+                function(err){
+                    logger.error('get_user_id', 'invalid installationId');
+                    log_cache.sadd('RawLog', LogObj.id);
+                    return Promise.reject(err);
+                }
+            );
+        };
+
+    var process_rawLog = function(params){
+        var object = params.logObj;
         var type = object.type;
         var pre_obj = {};
         var processed_obj = {};
@@ -362,20 +367,36 @@ module.exports = function(Log) {
             )
     };
 
-    var test = function(){
-        //log_cache.sadd('RawLog', 'a');
-        //log_cache.sadd('RawLog', 'c');
-        //log_cache.sadd('RawLog', '1');
-        //log_cache.sadd('RawLog', '2');
-        //log_cache.sadd('RawLog', '3');
-        //log_cache.sadd('RawLog', '4');
-        //log_cache.sadd('RawLog', '5');
+    var processing_error = function(){
         log_cache.smembers('RawLog', function(e, log_list){
             log_list.forEach(function(logId){
-                console.log(logId);
+                return Log.findOne({"id": logId})
+                    .then(
+                        function(log){
+                            return get_user_id(log);
+                        },
+                        function(err){
+                            logger.error('processing_err', "cannot find the Log instance!");
+                            return Promise.reject(err);
+                        })
+                    .then(
+                        function(dic){
+                            return process_rawLog(dic);
+                        },
+                        function(err){
+                            logger.error('processing_err', "catched error after get installation object!");
+                            return Promise.reject(err);
+                        })
+                    .catch(
+                        function(err){
+                            logger.error('processing_err', "catched error after post RefinedLog!");
+                            return Promise.reject(err);
+                        }
+                    );
             });
         });
+
     };
 
-    setInterval(test, 1000);
+    setInterval(processing_error, 5000);
 };
