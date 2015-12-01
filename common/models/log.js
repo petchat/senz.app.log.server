@@ -412,7 +412,6 @@ module.exports = function(Log) {
         });
 
     };
-    //processing_error();
 
-    //setInterval(processing_error, 50000);
+    setInterval(processing_error, 60000);
 };
