@@ -85,10 +85,12 @@ module.exports = function(Log) {
     });
 
     var get_user_id = function(LogObj){
-        return Log.app.models.Installation.findOne({where: {"id": LogObj.installationId}})
+        return Log.app.models.Installation.findOne({where: {"id":
+                        LogObj.__cachedRelations.installation.objectId}})
             .then(
                 function(installation){
-                    logger.info('get_user_id', 'LogObj.installationId: ' + LogObj.installationId);
+                    logger.info('get_user_id', 'LogObj.installationId: '
+                        + LogObj.__cachedRelations.installation.objectId);
                     return Promise.resolve({userId: installation.userId,
                                             deviceType: installation.deviceType,
                                             logObj: LogObj});
@@ -280,21 +282,6 @@ module.exports = function(Log) {
         _.extend(params, address)
 
         logger.debug(uuid,"params are \n" + JSON.stringify(params));
-
-        //if(!m_cache.get(objectId)){
-        //    logger.error(uuid,"The id " + uuid + " has been deleted!");
-        //    return;
-        //}
-        //async error catch using domain, although it may cause memory leaks.
-        //http://www.alloyteam.com/2013/12/node-js-series-exception-caught/
-
-        //try{
-        //    params["user"] = type.leanUser(m_cache.get(objectId)["user"].id);
-        //}
-        //catch (e){
-        //    logger.error(uuid,"error is " + e + ", if the error is due to the cache confliction, IGNORE");
-        //    return ;
-        //}
 
         return params;
     };
