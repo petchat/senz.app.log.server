@@ -205,11 +205,11 @@ module.exports = function(Log) {
             })
             .then(
                 function(body) {
-                    logger.debug(object.id, "post RefinedLog success");
+                    logger.debug(object.userRawdataId, "post RefinedLog success");
                     return Promise.resolve(body);
                 },
                 function(err){
-                    logger.error(object.id, "POST RefinedLog Failed!");
+                    logger.error(object.userRawdataId, "POST RefinedLog Failed!");
                     return Promise.reject(err);
                 }
             )
@@ -333,7 +333,7 @@ module.exports = function(Log) {
                 },
                 function(err){
                     logger.error(uuid, 'get location type failed!');
-                    logger.error(err);
+                    logger.error(uuid, JSON.stringify(err));
                     return Promise.reject("Error is " + err );
                 }
             )
@@ -413,5 +413,5 @@ module.exports = function(Log) {
 
     };
 
-    setInterval(processing_error, 60000);
+    //setInterval(processing_error, 60000);
 };
