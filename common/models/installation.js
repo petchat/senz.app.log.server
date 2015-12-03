@@ -66,6 +66,7 @@ module.exports = function(Installation) {
                 },
                 function(err){
                     console.log('register error!');
+                    cb(err);
                     return Promise.reject(err);
                 }
             );
