@@ -17,12 +17,6 @@
     "deviceType": {
       "type": "string",
       "required": true
-    },
-    "createdAt": {
-      "type": "date"
-    },
-    "updatedAt": {
-      "type": "date"
     }
   },
   "validations": [],
