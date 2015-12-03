@@ -14,8 +14,7 @@
       "type": "object"
     },
     "type": {
-      "type": "string",
-      "required": true
+      "type": "string"
     },
     "source": {
       "type": "string"
@@ -24,8 +23,7 @@
       "type": "number"
     },
     "timestamp": {
-      "type": "number",
-      "required": true
+      "type": "number"
     },
     "location": {
       "type": "geopoint"
