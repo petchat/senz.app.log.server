@@ -15,7 +15,7 @@
   },
   "User": {
     "dataSource": "qingcloud1-mongodb",
-    "public": false
+    "public": true
   },
   "Tracker": {
     "dataSource": "qingcloud1-mongodb",
@@ -51,7 +51,7 @@
   },
   "Installation": {
     "dataSource": "qingcloud1-mongodb",
-    "public": false
+    "public": true
   },
   "UserLog": {
     "dataSource": "qingcloud1-mongodb",
