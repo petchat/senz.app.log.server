@@ -1,7 +1,6 @@
 var req = require("request");
 var S = require("string");
 var uuid = require("uuid");
-//var Promise = require('bluebird');
 var AV = require("avoscloud-sdk").AV;
 
 module.exports = function(Installation) {
