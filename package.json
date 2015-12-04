@@ -25,7 +25,8 @@
     "uuid": "",
     "redis": "",
     "underscore": "",
-    "sendcloud": ""
+    "sendcloud": "",
+    "jade": ""
   },
   "optionalDependencies": {
     "loopback-explorer": "^1.1.0"
