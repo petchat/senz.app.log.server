@@ -29,7 +29,6 @@ module.exports = function(Installation) {
         .then(
             function (tracker) {
                 if (tracker) {
-                    console.log(tracker.id);
                     return Installation.create({
                         "userId": tracker.id,
                         "appId": appid,
