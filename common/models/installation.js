@@ -73,7 +73,7 @@ module.exports = function(Installation) {
     };
 
     Installation.remoteMethod(
-        "test",
+        "invent",
         {
             http: {path: "/invent", verb: "post"},
             accepts: {arg: "body", type: "object", http: {source: "req"}},
