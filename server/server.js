@@ -1,11 +1,15 @@
 var loopback = require('loopback');
 var boot = require('loopback-boot');
+var bodyParser = require('body-parser');
 
 
 var app = module.exports = loopback();
 
-
-app.use('/client', loopback.static(__dirname + '/../client'))
+app.set('views', __dirname + '/../views');
+app.set('view engine', 'jade');
+app.use('/client', loopback.static(__dirname + '/../client'));
+app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 
 app.start = function() {
@@ -15,6 +19,8 @@ app.start = function() {
     console.log('Web server listening at: %s', app.get('url'));
   });
 };
+
+
 
 // Bootstrap the application, configure models, datasources and middleware.
 // Sub-apps like REST API are mounted via boot scripts.
