@@ -5,8 +5,6 @@ var logger = new log("Model Log Hook Module");
 
 module.exports = function(Installation) {
     Installation.invent = function(req, cb) {
-
-        console.log(req.body);
         var appid = req.body.appId;
         var hardwareId = req.body.hardwareId;
         var deviceType = req.body.deviceType;
