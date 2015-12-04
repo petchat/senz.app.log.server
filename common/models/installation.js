@@ -1,4 +1,4 @@
-var req = require("request");
+//var req = require("request");
 var uuid = require("uuid");
 var log = require("../libraries/utils/logger").log;
 var logger = new log("Model Log Hook Module");
@@ -11,7 +11,7 @@ module.exports = function(Installation) {
 
         Promise.all([
             Installation.app.models.senz_app.findOne({where:{"id": appid}}),
-            Installation.app.models.Tracker.findOne({username: {$regex: '/^' + hardwareId + '/m'}})
+            Installation.app.models.Tracker.findOne({username: {$regex: '/^' + hardwareId + '/mi'}})
         ])
         .then(
             function (results) {
@@ -40,9 +40,9 @@ module.exports = function(Installation) {
                 }else{
                     return Installation.app.models.Tracker
                     .create({
-                        "username": hardwareId + "annonymous",
-                        "password": "skullfucking your mother",
-                        "email" : "fuck" + hardwareId + "@petchat.io"
+                        "username": hardwareId + "_nologin",
+                        "password": uuid.v4(),
+                        "email" : "nonexistence" + "@petchat.io"
                     })
                     .then(
                         function(tracker){
@@ -64,7 +64,7 @@ module.exports = function(Installation) {
         )
         .then(
             function(model){
-                logger.info('register success!');
+                logger.info(model.id, 'register success!');
                 cb(null, model);
                 return Promise.resolve(model);
             },
