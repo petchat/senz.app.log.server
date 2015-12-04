@@ -1,37 +1,18 @@
 {
-  "name": "Installation",
-  "plural": "Installations",
-  "base": "PersistedModel",
-  "idInjection": true,
-  "options": {
-    "validateUpsert": true
-  },
-  "mixins": {
-    "Timestamp": true
-  },
-  "properties": {
-    "hardwareId": {
-      "type": "string",
-      "required": true
+    "name": "Installation",
+    "plural": "Installations",
+    "base": "PersistedModel",
+    "idInjection": true,
+    "options": {
+        "validateUpsert": true
     },
-    "deviceType": {
-      "type": "string",
-      "required": true
-    }
-  },
-  "validations": [],
-  "relations": {
-    "user": {
-      "type": "belongsTo",
-      "model": "User",
-      "foreignKey": ""
+    "mixins": {
+        "Timestamp": true
     },
-    "app": {
-      "type": "belongsTo",
-      "model": "senz_app",
-      "foreignKey": ""
-    }
-  },
-  "acls": [],
-  "methods": {}
+    "properties": {
+    },
+    "validations": [],
+    "relations": {},
+    "acls": [],
+    "methods": {}
 }

@@ -1,29 +1,37 @@
 {
-  "name": "senz_app",
-  "plural": "senz_apps",
-  "base": "PersistedModel",
-  "idInjection": true,
-  "options": {
+    "name": "senz_app",
+    "plural": "senz_apps",
+    "base": "PersistedModel",
+    "idInjection": true,
+    "options": {
     "validateUpsert": true
-  },
-  "properties": {
-    "name": {
-      "type": "string",
-      "required": true
     },
-    "description": {
-      "type": "string",
-      "required": true
+    "mixins": {
+        "Timestamp": true
     },
-    "createdAt": {
-      "type": "date"
+    "properties": {
+        "app_name": {
+            "type": "string",
+            "required": true
+        },
+        "app_key": {
+            "type": "string",
+            "required": true
+        },
+        "type": {
+            "type": "string",
+            "required": true
+        },
+        "user_id": {
+            "type": "string",
+            "required": true
+        },
+        "description": {
+            "type": "string"
+        }
     },
-    "updatedAt": {
-      "type": "date"
-    }
-  },
-  "validations": [],
-  "relations": {},
-  "acls": [],
-  "methods": {}
+    "validations": [],
+    "relations": {},
+    "acls": [],
+    "methods": {}
 }
