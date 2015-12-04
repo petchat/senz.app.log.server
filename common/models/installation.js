@@ -5,20 +5,22 @@ var logger = new log("Model Log Hook Module");
 
 module.exports = function(Installation) {
     Installation.invent = function(req, cb) {
+
+        console.log(req.body);
         var appid = req.body.appId;
         var hardwareId = req.body.hardwareId;
         var deviceType = req.body.deviceType;
 
         Promise.all([
-            Installation.app.models.senz_app.findOne({where:{"app_id": appid}}),
+            Installation.app.models.senz_app.findOne({where:{"id": appid}}),
             Installation.app.models.Tracker.findOne({username: {$regex: '/^' + hardwareId + '/m'}})
         ])
         .then(
             function (results) {
-                if(!results[0] || !results[1]){
-                    return Promise.reject("Invalid appId or hardwareId");
+                if(!results[0]){
+                    return Promise.reject("Invalid appId");
                 }else{
-                    return Promise.resolve(results[1].id);
+                    return Promise.resolve(results[1]);
                 }
             },
             function (err) {
@@ -27,11 +29,11 @@ module.exports = function(Installation) {
             }
         )
         .then(
-            function (trackerId) {
-                if (trackerId) {
-                    console.log(trackerId);
+            function (tracker) {
+                if (tracker) {
+                    console.log(tracker.id);
                     return Installation.create({
-                        "userId": trackerId,
+                        "userId": tracker.id,
                         "appId": appid,
                         "hardwareId": hardwareId,
                         "deviceType": deviceType,
