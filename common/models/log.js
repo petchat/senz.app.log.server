@@ -85,12 +85,12 @@ module.exports = function(Log) {
     });
 
     var get_user_id = function(LogObj){
-        return Log.app.models.Installation.findOne({where: {"id":
-                        LogObj.installationId}})
+        logger.info('get_user_id', 'LogObj.installationId: ' + LogObj.installationId);
+        return Log.app.models.Installation.findOne({where: {"id": LogObj.installationId}})
             .then(
                 function(installation){
-                    logger.info('get_user_id', 'LogObj.installationId: '
-                        + LogObj.installationId);
+                    if(!installation) return Promise.reject("Invalid InstallationId!");
+
                     return Promise.resolve({userId: installation.userId,
                                             deviceType: installation.deviceType,
                                             logObj: LogObj});
@@ -319,9 +319,8 @@ module.exports = function(Log) {
                     return Promise.resolve(processed);
                 },
                 function(err){
-                    logger.error(uuid, 'get location type failed!');
                     logger.error(uuid, JSON.stringify(err));
-                    return Promise.reject("Error is " + err );
+                    return Promise.reject(JSON.stringify(err));
                 }
             )
     };
