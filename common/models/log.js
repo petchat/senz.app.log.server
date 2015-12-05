@@ -86,11 +86,11 @@ module.exports = function(Log) {
 
     var get_user_id = function(LogObj){
         return Log.app.models.Installation.findOne({where: {"id":
-                        LogObj.__cachedRelations.installation.objectId}})
+                        LogObj.installationId}})
             .then(
                 function(installation){
                     logger.info('get_user_id', 'LogObj.installationId: '
-                        + LogObj.__cachedRelations.installation.objectId);
+                        + LogObj.installationId);
                     return Promise.resolve({userId: installation.userId,
                                             deviceType: installation.deviceType,
                                             logObj: LogObj});

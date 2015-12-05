@@ -28,6 +28,7 @@
     "underscore": "",
     "uuid": "",
     "wascally": ""
+
   },
   "optionalDependencies": {
     "loopback-explorer": "^1.1.0"
