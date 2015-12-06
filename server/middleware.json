@@ -20,7 +20,11 @@
       "paths": "/status"
     }
   },
-  "files": {},
+  "files": {
+      "loopback#static": {
+          "params": "$!../dashboard/static"
+      }
+  },
   "final": {
     "loopback#urlNotFound": {}
   },

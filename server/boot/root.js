@@ -6,9 +6,8 @@ module.exports = function(server) {
         res.render('index', { title: 'Hey', message: 'Hello there!'});
     });
 
-    router.post('/test', function(req, res){
-        console.log(req.body);
-        res.send({msg: "OK!"});
+    router.get('/test', function(req, res){
+        res.render('login', { title: 'Hey', message: 'Hello there!'});
     });
 
     server.use(router);
