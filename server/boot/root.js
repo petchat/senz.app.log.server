@@ -6,9 +6,16 @@ module.exports = function(server) {
         res.render('index', { title: 'Hey', message: 'Hello there!'});
     });
 
-    router.get('/test', function(req, res){
+    router.use('/login', function(req, res, next){
         res.render('login', { title: 'Hey', message: 'Hello there!'});
+
+        next();
     });
+
+    router.get('/test', function(req, res){
+        res.render('test', { title: 'Hey', message: 'Hello there!'});
+    });
+
 
     server.use(router);
 };
