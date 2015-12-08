@@ -4,12 +4,12 @@ var logger = new log("Model Log Hook Module");
 
 module.exports = function(Installation) {
     Installation.invent = function(req, cb) {
-        var appid = req.body.appId;
+        var appId = req.body.appId;
         var hardwareId = req.body.hardwareId;
         var deviceType = req.body.deviceType;
 
         Promise.all([
-            Installation.app.models.senz_app.findOne({where:{"id": appid}}),
+            Installation.app.models.senz_app.findOne({where:{"id": appId}}),
             Installation.app.models.Tracker.findOne({username: {$regex: '/^' + hardwareId + '/mi'}})
         ])
         .then(
@@ -28,12 +28,15 @@ module.exports = function(Installation) {
         )
         .then(
             function (tracker) {
-                return Installation.create({
+                Installation.create({
                     "userId": tracker.id,
-                    "appId": appid,
+                    "appId": appId,
                     "hardwareId": hardwareId,
                     "deviceType": deviceType,
                     "deviceToken": uuid.v4()
+                }, function(err, model){
+                    cb(err, model);
+                    return Promise.resolve(model);
                 })
             },
             function (err) {
@@ -42,12 +45,7 @@ module.exports = function(Installation) {
                 return Promise.reject(err);
             }
         )
-        .then(
-            function(model){
-                logger.info(model.id, 'register success!');
-                cb(null, model);
-                return Promise.resolve(model);
-            },
+        .catch(
             function(err){
                 logger.error(hardwareId, err);
                 cb(err);
