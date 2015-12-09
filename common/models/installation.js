@@ -35,7 +35,7 @@ module.exports = function(Installation) {
                     "deviceType": deviceType,
                     "deviceToken": uuid.v4()
                 }, function(err, model){
-                    model.installationId = model.id;
+                    //model.installationId = model.id;
                     cb(err, model);
                     return Promise.resolve(model);
                 })
