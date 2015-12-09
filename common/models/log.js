@@ -61,7 +61,7 @@ module.exports = function(Log) {
     Log.observe("after save", function(ctx, next){
         if(ctx.isNewInstance){
             console.log('Saved %s#%s', ctx.Model.modelName, ctx.instance.id);
-            return get_user_id(ctx.instance)
+            get_user_id(ctx.instance)
                 .then(
                     function(dic){
                         return process_rawLog(dic);
@@ -73,7 +73,7 @@ module.exports = function(Log) {
                 .then(
                     function(){
                         logger.info(ctx.instance.id, "process object success in after save!");
-                        return Promise.resolve();
+                        return Promise.resolve({});
                     },
                     function(err){
                         logger.error(ctx.instance.id, "process object failed in after save!");
@@ -281,7 +281,7 @@ module.exports = function(Log) {
         params["near_home_office"] = near_home_office;
         _.extend(params, address)
 
-        logger.debug(uuid,"params are \n" + JSON.stringify(params));
+        //logger.debug(uuid,"params are \n" + JSON.stringify(params));
 
         return params;
     };
