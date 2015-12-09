@@ -4,8 +4,7 @@ module.exports = function(server) {
         console.log(ctx);
         ctx.result = {id: ctx.result.id,
             createdAt: ctx.result.createdAt,
-            userId: ctx.result.userId,
-            installationId: ctx.result.installationId};
+            userId: ctx.result.userId};
         next();
     });
 };
