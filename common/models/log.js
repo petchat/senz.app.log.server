@@ -61,7 +61,7 @@ module.exports = function(Log) {
     Log.observe("after save", function(ctx, next){
         if(ctx.isNewInstance){
             console.log('Saved %s#%s', ctx.Model.modelName, ctx.instance.id);
-            return get_user_id(ctx.instance)
+            get_user_id(ctx.instance)
                 .then(
                     function(dic){
                         return process_rawLog(dic);
