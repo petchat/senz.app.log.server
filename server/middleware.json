@@ -16,9 +16,6 @@
     "auth": {},
     "parse": {},
     "routes": {
-        "loopback#status": {
-            "paths": "/status"
-        }
     },
     "files": {
         "loopback#static": {

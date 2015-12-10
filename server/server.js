@@ -6,8 +6,10 @@ var bodyParser = require('body-parser');
 var app = module.exports = loopback();
 
 app.set('views', __dirname + '/../dashboard/views');
-app.set('view engine', 'jade');
-app.use(loopback.static(__dirname + '/dashboard/static'));
+
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'ejs');
+
 app.use('/client', loopback.static(__dirname + '/../client'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
