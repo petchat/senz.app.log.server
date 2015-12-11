@@ -135,15 +135,15 @@ module.exports = function(Log) {
                 url += 'ForTests';
                 break;
             case "location":
-                //var installation_object_id = object.id;
-                //if (installation_object_id == "7EVwvG7hfaXz0srEtPGJpaxezs2JrHft" && Math.random() < 0.2  ){
-                //    var geo_now = {lng: object.location.longitude ,lat: object.location.latitude };
-                //    if(converter.isCoordinateInChaos(geo_now)){
-                //        alertist.alert_user("shit you");
-                //    }else{
-                //        console.log("coordinate operated normally");
-                //    }
-                //}
+                var installation_object_id = object.id;
+                if (installation_object_id == "7EVwvG7hfaXz0srEtPGJpaxezs2JrHft" && Math.random() < 0.2  ){
+                    var geo_now = {lng: object.location.longitude ,lat: object.location.latitude };
+                    if(converter.isCoordinateInChaos(geo_now)){
+                        alertist.alert_user("shit you");
+                    }else{
+                        console.log("coordinate operated normally");
+                    }
+                }
                 pre_obj = {};
                 pre_obj.location = object.location;
                 pre_obj.objectId = object.id;
