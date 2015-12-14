@@ -33,11 +33,14 @@ module.exports = function(Log) {
             compressed = ctx.instance.compressed;
 
         if( pre_type == "location" && pre_source == "internal"){
-            var backup_location = {"lat": pre_location.lat, "lng": pre_location.lng};
-            var c_location = converter.toBaiduCoordinate(pre_location.lng, pre_location.lat);
+            var backup_location = {"lat": pre_location.lat||pre_location.latitude,
+                                    "lng": pre_location.lng||pre_location.longitude};
+            var c_location = converter.toBaiduCoordinate(pre_location.lng||pre_location.longitude,
+                                                        pre_location.lat||pre_location.latitude);
             var source = "baidu offline converter";
 
-            ctx.instance.location = new loopback.GeoPoint({lat: c_location.lat, lng: c_location.lng});
+            ctx.instance.location = new loopback.GeoPoint({lat: c_location.lat||c_location.latitude,
+                                                            lng: c_location.lng||c_location.longitude});
             ctx.instance.source = source;
             ctx.instance.pre_location = backup_location;
         }
@@ -135,9 +138,11 @@ module.exports = function(Log) {
                 url += 'ForTests';
                 break;
             case "location":
+                console.log(object.location);
                 var installation_object_id = object.id;
                 if (installation_object_id == "7EVwvG7hfaXz0srEtPGJpaxezs2JrHft" && Math.random() < 0.2  ){
-                    var geo_now = {lng: object.location.longitude ,lat: object.location.latitude };
+                    var geo_now = {lng: object.location.lng||object.location.longitude ,
+                                    lat: object.location.lat||object.location.latitude };
                     if(converter.isCoordinateInChaos(geo_now)){
                         alertist.alert_user("shit you");
                     }else{
@@ -292,8 +297,8 @@ module.exports = function(Log) {
         new_obj["timestamp"] = params.timestamp;
         new_obj["objectId"] = params.objectId;
 
-        new_obj["location"] = new loopback.GeoPoint({lat: params.location.lat,
-                                                    lng: params.location.lng});
+        new_obj["location"] = new loopback.GeoPoint({lat: params.location.lat||params.location.latitude,
+                                                    lng: params.location.lng||params.location.longitude});
         new_obj["radius"] = params.radius;
         locations.push(new_obj);
 
