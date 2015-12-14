@@ -268,18 +268,18 @@ module.exports = function(Log) {
             prob_lv2_object = _.extend(prob_lv2_object,type1_obj.level2_prob);
         });
 
-        var address = body.results.pois[0].address
+        var address = body.results.pois[0].address;
 
 
         params["pois"] = body.results.pois[0];
         //params["isTrainingSample"] = config.is_sample;
         params["userRawdataId"] = userRawdataId;
-        params["timestamp"] = timestamp
+        params["timestamp"] = timestamp;
         params["processStatus"] = "untreated";
         params["poiProbLv1"] = prob_lv1_object;
         params["poiProbLv2"] = prob_lv2_object;
         params["near_home_office"] = near_home_office;
-        _.extend(params, address)
+        _.extend(params, address);
 
         //logger.debug(uuid,"params are \n" + JSON.stringify(params));
 
@@ -291,8 +291,9 @@ module.exports = function(Log) {
         var new_obj = {};
         new_obj["timestamp"] = params.timestamp;
         new_obj["objectId"] = params.objectId;
-        new_obj["location"] = {latitude: params.location.lat,
-                               longitude: params.location.lng};
+
+        new_obj["location"] = new loopback.GeoPoint({lat: params.location.lat,
+                                                    lng: params.location.lng});
         new_obj["radius"] = params.radius;
         locations.push(new_obj);
 
