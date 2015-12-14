@@ -296,9 +296,8 @@ module.exports = function(Log) {
         var new_obj = {};
         new_obj["timestamp"] = params.timestamp;
         new_obj["objectId"] = params.objectId;
-
-        new_obj["location"] = new loopback.GeoPoint({lat: params.location.lat||params.location.latitude,
-                                                    lng: params.location.lng||params.location.longitude});
+        new_obj["location"] = {latitude: params.location.lat||params.location.latitude,
+                                longitude: params.location.lng||params.location.longitude};
         new_obj["radius"] = params.radius;
         locations.push(new_obj);
 
@@ -306,7 +305,8 @@ module.exports = function(Log) {
         req_body.dev_key = "senz";
         req_body.userId = params.userId;
 
-        var url = "http://api.trysenz.com/productivity/parserhub/locationprob/";
+        //var url = "http://api.trysenz.com/productivity/parserhub/locationprob/";
+        var url = "http://api.trysenz.com/v2/parserhub/locationprob/";
         var uuid = params.objectId;
         logger.debug(uuid, "Params are " + JSON.stringify(req_body));
         return request.post(
