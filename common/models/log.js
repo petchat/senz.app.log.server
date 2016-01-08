@@ -100,6 +100,8 @@ module.exports = function(Log) {
     var process_rawLog = function(params){
         var object = params.logObj;
         var type = object.type;
+        var user_id = params.userId;
+        var deviceType = params.deviceType;
         var pre_obj = {};
         var processed_obj = {};
         var url = 'http://119.254.111.40:3000/api/';
@@ -107,6 +109,29 @@ module.exports = function(Log) {
         {
             case "sensor":
             case "predictedMotion":
+                processed_obj = {};
+                var android_motion_to_standard_motion = {
+                    "ride": "riding",
+                    "sit": "sitting",
+                    "run": "running",
+                    "walk": "walking",
+                    "drive": "driving"
+                };
+                processed_obj.user_id = params.userId;
+                processed_obj.userRawdataId = object.id;
+                processed_obj.timestamp = object.timestamp;
+                processed_obj.type = object.type;
+                processed_obj.rawInfo = object.value;
+                var motionProb = object.value.detectedResults.motion;
+                var isWatchPhone = object.value.detectedResults.isWatchPhone;
+                var new_motionProb = {};
+                Object.keys(motionProb).forEach(function(android_key){
+                    new_motionProb[android_motion_to_standard_motion[android_key]] = motionProb[android_key]
+                });
+                processed_obj.motionProb = new_motionProb;
+                processed_obj.isWatchPhone = isWatchPhone;
+                return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
+                break;
             case "accSensor":
                 logger.debug('type', type);
                 pre_obj = {};
