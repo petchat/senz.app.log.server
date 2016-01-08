@@ -78,7 +78,6 @@ module.exports = function(Log) {
 
     var get_user_id = function(LogObj){
         var installationId = LogObj.installationId || LogObj.installation.objectId;
-        logger.debug("LogObj", JSON.stringify(LogObj));
         logger.info('get_user_id', 'LogObj.installationId: ' + installationId);
         return Log.app.models.Installation.findOne({where: {"id": installationId}})
             .then(
