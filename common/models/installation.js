@@ -8,6 +8,8 @@ module.exports = function(Installation) {
         var hardwareId = req.hardwareId;
         var deviceType = req.deviceType;
 
+        logger.debug("invent", hardwareId + " " + appId);
+
         Promise.all([
             Installation.app.models.senz_app.findOne({where:{"id": appId}}),
             Installation.app.models.Tracker.findOne({where: {"hardwareId": hardwareId}})
