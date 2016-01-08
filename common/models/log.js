@@ -77,8 +77,10 @@ module.exports = function(Log) {
     });
 
     var get_user_id = function(LogObj){
-        logger.info('get_user_id', 'LogObj.installationId: ' + LogObj.installationId);
-        return Log.app.models.Installation.findOne({where: {"id": LogObj.installationId}})
+        var installationId = LogObj.installationId || LogObj.installation.objectId;
+        logger.debug("LogObj", JSON.stringify(LogObj));
+        logger.info('get_user_id', 'LogObj.installationId: ' + installationId);
+        return Log.app.models.Installation.findOne({where: {"id": installationId}})
             .then(
                 function(installation){
                     if(!installation) return Promise.reject("Invalid InstallationId!");
@@ -345,7 +347,7 @@ module.exports = function(Log) {
 
     var request_motion_type = function(params){
         var url = "https://api.trysenz.com/utils/motion_detector/";
-
+        logger.debug("", JSON.stringify(params));
         logger.debug(params.objectId, "request motion type");
         return request.post(
             {
