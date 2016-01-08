@@ -345,14 +345,13 @@ module.exports = function(Log) {
 
     var request_motion_type = function(params){
         var url = "https://api.trysenz.com/utils/motion_detector/";
-        var uuid = params.objectId;
 
-        logger.debug(uuid, "request motion type");
+        logger.debug(params.objectId, "request motion type");
         return request.post(
             {
                 url: url,
                 headers:{
-                    "X-request-Id": uuid
+                    "X-request-Id": params.objectId
                 },
                 json: params
             })
@@ -365,7 +364,7 @@ module.exports = function(Log) {
                     return Promise.resolve(processed_data);
                 },
                 function(err){
-                    logger.error(uuid, "motion service request error");
+                    logger.error(params.objectId, "motion service request error: " + JSON.stringify(err));
                     return Promise.reject(err);
                 }
             )
