@@ -103,7 +103,7 @@ module.exports = function(Log) {
         var processed_obj = {};
         var url = 'http://119.254.111.40:3000/api/';
         logger.debug('type', type);
-        logger.debug('user_id', object.user_id);
+        logger.debug('user_id', params.userId);
         switch (type)
         {
             case "sensor":
