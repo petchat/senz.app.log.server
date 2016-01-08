@@ -108,6 +108,44 @@ module.exports = function(Log) {
         switch (type)
         {
             case "sensor":
+                processed_obj = {};
+                processed_obj.user_id = params.userId;
+                processed_obj.userRawdataId = object.id;
+                processed_obj.timestamp = object.timestamp;
+                processed_obj.type = object.type;
+                var sensor_array = object.value.events;
+                var activity_array = _.filter(sensor_array, function(sample){return sample.sensorName == "activity"});
+
+                if(activity_array.length == 0){
+                    processed_obj.motionProb= {"unknown":1}
+                }else{
+                    var max_prob_activity = _.max(activity_array, function(status){
+                        var values = status.values;
+                        var temp_max = -1;
+                        var temp_type = "";
+                        Object.keys(values).forEach(function(type){
+                            if(values[type] >= temp_max){
+                                temp_max = values[type];
+                                temp_type = type
+                            }
+                        });
+                        return temp_max
+                    });
+                    var values = max_prob_activity.values;
+                    var temp_max = -1;
+                    var temp_type = "";
+                    Object.keys(values).forEach(function(type){
+                        if(values[type] >= temp_max){
+                            temp_max = values[type];
+                            temp_type = type
+                        }
+                    });
+                    var ios_type_dict = {"unknown":"unknow","stationary":"sitting","automotive":"driving","cycling":"riding","walking":"walking","running":"running"};
+                    processed_obj.motionProb = {};
+                    processed_obj.motionProb[[ios_type_dict[temp_type]]] = 1;
+                }
+                return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
+                break;
             case "accSensor":
             case "predictedMotion":
                 processed_obj = {};
