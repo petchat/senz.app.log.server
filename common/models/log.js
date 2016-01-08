@@ -56,7 +56,6 @@ module.exports = function(Log) {
             get_user_id(ctx.instance)
                 .then(
                     function(dic){
-                        logger.debug("", JSON.stringify(dic));
                         return process_rawLog(dic);
                     },
                     function(err){
