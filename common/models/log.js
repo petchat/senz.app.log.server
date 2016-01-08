@@ -101,7 +101,7 @@ module.exports = function(Log) {
         var type = object.type;
         var pre_obj = {};
         var processed_obj = {};
-        var url = 'http://119.254.111.40:3000/api/';
+        var url = 'http://119.254.111.40:3000/api/ForTests';
         logger.debug('type', type);
         logger.debug('user_id', params.userId);
         switch (type)
@@ -115,6 +115,7 @@ module.exports = function(Log) {
                 processed_obj.userRawdataId = object.id;
                 processed_obj.timestamp = object.timestamp;
                 processed_obj.type = object.type;
+                url = 'http://119.254.111.40:3000/api/UserMotions';
                 if(type == "sensor") {
                     var sensor_array = object.value.events;
                     var activity_array = _.filter(sensor_array, function (sample) {
@@ -156,7 +157,6 @@ module.exports = function(Log) {
                         processed_obj.motionProb = {};
                         processed_obj.motionProb[[ios_type_dict[temp_type]]] = 1;
                     }
-                    return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
                 }
                 if(type == "predictedMotion") {
                     var android_motion_to_standard_motion = {
@@ -175,18 +175,17 @@ module.exports = function(Log) {
                     });
                     processed_obj.motionProb = new_motionProb;
                     processed_obj.isWatchPhone = isWatchPhone;
-                    return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
                 }
                 if(type == "calendar"){
                     processed_obj.calendarInfo = object.value;
-                    return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
                 }
+                return post_refined_log(url, processed_obj);
                 break;
             case "mic":
                 url += 'ForTests';
                 break;
             case "location":
-                console.log(object.location);
+                url = 'http://119.254.111.40:3000/api/UserLocations';
                 var installation_object_id = object.id;
                 if (installation_object_id == "7EVwvG7hfaXz0srEtPGJpaxezs2JrHft" && Math.random() < 0.2  ){
                     var geo_now = {lng: object.location.lng||object.location.longitude,
@@ -207,8 +206,7 @@ module.exports = function(Log) {
                     .then(
                         function(location_type){
                             location_type.user_id = params.userId;
-                            url += 'UserLocatins';
-                            return post_refined_log('http://119.254.111.40:3000/api/ForTests', location_type);
+                            return post_refined_log(url, location_type);
                         },
                         function(err){
                             logger.error(object.id, "UserLocation service requested in fail");
@@ -216,6 +214,7 @@ module.exports = function(Log) {
                         });
                 break;
             case "application":
+                url = 'http://119.254.111.40:3000/api/UserStaticInfos';
                 pre_obj = {};
                 if(params.deviceType == "android"){
                     pre_obj.platform = "Android";
@@ -235,8 +234,7 @@ module.exports = function(Log) {
                         processed_obj.staticInfo = staticInfo;
                         processed_obj.timestamp = object.timestamp;
                         processed_obj.userRawdataId = object.id;
-                        url += 'UserStaticInfo';
-                        return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
+                        return post_refined_log(url, processed_obj);
                     },
                     function(err){
                         logger.error(object.id, "Static info service requested in fail");
