@@ -12,6 +12,7 @@ module.exports = function(server) {
                 type: "",
                 user_id: req.body.developer_id
             }, function(err, model){
+                if(err) console.log(err);
                 res.send(model);
             });
         }
