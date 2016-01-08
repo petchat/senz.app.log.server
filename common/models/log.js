@@ -189,7 +189,7 @@ module.exports = function(Log) {
                 console.log(object.location);
                 var installation_object_id = object.id;
                 if (installation_object_id == "7EVwvG7hfaXz0srEtPGJpaxezs2JrHft" && Math.random() < 0.2  ){
-                    var geo_now = {lng: object.location.lng||object.location.longitude ,
+                    var geo_now = {lng: object.location.lng||object.location.longitude,
                                     lat: object.location.lat||object.location.latitude };
                     if(converter.isCoordinateInChaos(geo_now)){
                         alertist.alert_user("shit you");

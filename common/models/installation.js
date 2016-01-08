@@ -18,6 +18,7 @@ module.exports = function(Installation) {
 
                 return results[1] || Installation.app.models.Tracker.create({
                     "username": hardwareId + "_nologin",
+                    "hardwareId": hardwareId,
                     "password": uuid.v4(),
                     "email" : "nonexistence" + "@petchat.io"});
             },
