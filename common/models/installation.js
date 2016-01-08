@@ -12,7 +12,7 @@ module.exports = function(Installation) {
 
         Promise.all([
             Installation.app.models.senz_app.findOne({where:{"id": appId}}),
-            Installation.app.models.Tracker.findOne({where: {"hardwareId": hardwareId}})
+            Installation.app.models.Tracker.findOne({where:{"hardwareId": hardwareId}})
         ])
         .then(
             function (results) {
