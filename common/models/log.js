@@ -253,12 +253,22 @@ module.exports = function(Log) {
             logger.error(uuid,"Error is " + "key error and the error object is " + JSON.stringify(body.results));
             return;
         }
-        var near_home_office = body.home_office_label;
+
+        var version = body.version;
+        var near_home_office = body.results.pois[0].home_office_label;
         var poi_probability = body.results.poi_probability[0];
-        var uuid = objectId;
-        //console.log("response results" + typeof json_body);
+        var speed = body.results.pois[0].speed;
+        var weather = body.results.pois[0].weather.data;
+        var city = body.results.pois[0].address.city;
+        var district = body.results.pois[0].address.district;
+        var nation = body.results.pois[0].address.nation;
+        var province = body.results.pois[0].address.province;
+        var street = body.results.pois[0].address.street;
+        var street_number = body.results.pois[0].address.street_number;
+        var address = body.results.pois[0].address;
+
         if(typeof poi_probability !== typeof {} ){
-            logger.error(uuid,"Error is " + "Type error and the error object is " + JSON.stringify(body.results));
+            logger.error(objectId,"Error is " + "Type error and the error object is " + JSON.stringify(body.results));
             return;
         }
         var userRawdataId = objectId;
@@ -273,10 +283,9 @@ module.exports = function(Log) {
             prob_lv2_object = _.extend(prob_lv2_object,type1_obj.level2_prob);
         });
 
-        var address = body.results.pois[0].address;
 
 
-        params["pois"] = body.results.pois[0];
+        params["pois"] = body.results.pois[0].pois;
         //params["isTrainingSample"] = config.is_sample;
         params["userRawdataId"] = userRawdataId;
         params["timestamp"] = timestamp;
@@ -284,10 +293,16 @@ module.exports = function(Log) {
         params["poiProbLv1"] = prob_lv1_object;
         params["poiProbLv2"] = prob_lv2_object;
         params["near_home_office"] = near_home_office;
+        params["speed"] = speed;
+        params["city"] = city;
+        params["district"] = district;
+        params["nation"] = nation;
+        params["province"] = province;
+        params["street_number"] = street_number;
+        params["street"] = street;
+        params["weather"] = weather;
+        params['version'] = version;
         _.extend(params, address);
-
-        //logger.debug(uuid,"params are \n" + JSON.stringify(params));
-
         return params;
     };
 
@@ -306,7 +321,7 @@ module.exports = function(Log) {
         req_body.userId = params.userId;
 
         //var url = "http://api.trysenz.com/productivity/parserhub/locationprob/";
-        var url = "http://api.trysenz.com/v2/parserhub/locationprob/";
+        var url = "https://api.trysenz.com/v2/parserhub/location/info/";
         var uuid = params.objectId;
         logger.debug(uuid, "Params are " + JSON.stringify(req_body));
         return request.post(
