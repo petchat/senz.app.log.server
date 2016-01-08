@@ -1,22 +1,11 @@
 var log = require("../libraries/utils/logger").log;
-var logger = new log("Model Log Hook Module");
+var logger = new log("<senz.app.log.server>");
 var converter = require("../libraries/utils/coordinate_trans.js");
 var zlib = require("zlib");
 var request = require('request-promise');
 var redis = require("redis");
 var _ = require("underscore");
 var loopback = require('loopback');
-
-var log_example = {
-    "value": {"events": "test"},
-    "type": "location",
-    "source": "sdk",
-    "locationRadius": 5,
-    "timestamp": 1123333444,
-    "location": {"lat":39.98057,"lng":116.4385},
-    "userId": "559b7e6e2b5f91ab718914b4",
-    "installationId": "559cd13c05986730cc6ce337"
-};
 
 var log_cache = redis.createClient(6379, '127.0.0.1');
 log_cache.on("error", function (err) {

@@ -9,32 +9,7 @@
     "mixins": {
         "Timestamp": true
     },
-    "properties": {
-        "value": {
-            "type": "object"
-        },
-        "type": {
-            "type": "string"
-        },
-        "source": {
-            "type": "string"
-        },
-        "locationRadius": {
-            "type": "number"
-        },
-        "timestamp": {
-            "type": "number"
-        },
-        "location": {
-            "type": "geopoint"
-        },
-        "file": {
-            "type": "string"
-        },
-        "url": {
-            "type": "string"
-        }
-    },
+    "properties": {},
     "validations": [],
     "relations": {},
     "acls": [],
