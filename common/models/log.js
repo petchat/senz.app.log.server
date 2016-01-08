@@ -135,7 +135,7 @@ module.exports = function(Log) {
             case "accSensor":
                 logger.debug('type', type);
                 pre_obj = {};
-                pre_obj.rawData = object.value.events;
+                pre_obj.rawData = object.rawData;
                 pre_obj.objectId = object.id;
                 pre_obj.timestamp = object.timestamp;
                 return request_motion_type(pre_obj)
