@@ -100,14 +100,14 @@ module.exports = function(Log) {
     var process_rawLog = function(params){
         var object = params.logObj;
         var type = object.type;
-        var user_id = params.userId;
-        var deviceType = params.deviceType;
         var pre_obj = {};
         var processed_obj = {};
         var url = 'http://119.254.111.40:3000/api/';
+        logger.debug('type', type);
         switch (type)
         {
             case "sensor":
+            case "accSensor":
             case "predictedMotion":
                 processed_obj = {};
                 var android_motion_to_standard_motion = {
@@ -131,24 +131,6 @@ module.exports = function(Log) {
                 processed_obj.motionProb = new_motionProb;
                 processed_obj.isWatchPhone = isWatchPhone;
                 return post_refined_log('http://119.254.111.40:3000/api/ForTests', processed_obj);
-                break;
-            case "accSensor":
-                logger.debug('type', type);
-                pre_obj = {};
-                pre_obj.rawData = object.rawData;
-                pre_obj.objectId = object.id;
-                pre_obj.timestamp = object.timestamp;
-                return request_motion_type(pre_obj)
-                    .then(
-                        function(motion_data){
-                            motion_data.user_id = params.userId;
-                            url += 'UserMotions';
-                            return post_refined_log('http://119.254.111.40:3000/api/ForTests', motion_data);
-                        },
-                        function(err){
-                            logger.error(object.id, "UserMotion service requested in fail");
-                            return Promise.reject(err);
-                        });
                 break;
             case "mic":
                 url += 'ForTests';
