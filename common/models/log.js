@@ -459,6 +459,33 @@ module.exports = function(Log) {
         });
 
     };
-
-    //setInterval(processing_error, 60000);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

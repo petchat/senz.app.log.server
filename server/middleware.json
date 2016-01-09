@@ -1,31 +1,30 @@
 {
-    "initial:before": {
-        "loopback#favicon": {}
-    },
-    "initial": {
+  "initial:before": {
+    "loopback#favicon": {}
+  },
+  "initial": {
     "compression": {},
     "cors": {
-        "params": {
-            "origin": true,
-            "credentials": true,
-            "maxAge": 86400
-        }
+      "params": {
+        "origin": true,
+        "credentials": true,
+        "maxAge": 86400
+      }
     }
-    },
-    "session": {},
-    "auth": {},
-    "parse": {},
-    "routes": {
-    },
-    "files": {
-        "loopback#static": {
-            "params": "$!../dashboard/static"
-        }
-    },
-    "final": {
-        "loopback#urlNotFound": {}
-    },
-    "final:after": {
-        "errorhandler": {}
+  },
+  "session": {},
+  "auth": {},
+  "parse": {},
+  "routes": {},
+  "files": {
+    "loopback#static": {
+      "params": "$!../dashboard/static"
     }
+  },
+  "final": {
+    "loopback#urlNotFound": {}
+  },
+  "final:after": {
+    "errorhandler": {}
+  }
 }

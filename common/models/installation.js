@@ -2,6 +2,7 @@ var uuid = require("uuid");
 var log = require("../libraries/utils/logger").log;
 var logger = new log("Model Log Hook Module");
 
+
 module.exports = function(Installation) {
     Installation.invent = function(req, cb) {
         var appId = req.appId;
@@ -23,12 +24,7 @@ module.exports = function(Installation) {
                     "hardwareId": hardwareId,
                     "password": uuid.v4(),
                     "email" : "nonexistence" + "@petchat.io"});
-            },
-            function (err) {
-                cb(err);
-                return Promise.reject(err);
-            }
-        )
+            })
         .then(
             function (tracker) {
                 Installation.create({
@@ -41,13 +37,7 @@ module.exports = function(Installation) {
                     cb(err, model);
                     return Promise.resolve(model);
                 })
-            },
-            function (err) {
-                logger.error(hardwareId, err);
-                cb(err);
-                return Promise.reject(err);
-            }
-        )
+            })
         .catch(
             function(err){
                 logger.error(hardwareId, err);
@@ -62,7 +52,7 @@ module.exports = function(Installation) {
         {
             http: {path: "/invent", verb: "post"},
             accepts: {arg: "body", type: "object", http: {source: "body"}},
-            returns: {arg: "result", type: "object", root: true}
+            returns: {arg: "result", type: "object"}
         }
     );
 };

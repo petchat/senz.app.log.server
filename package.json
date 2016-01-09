@@ -27,8 +27,10 @@
     "tracer": "",
     "underscore": "",
     "uuid": "",
+    "apn": "",
+    "path": "",
+    "mkdirp": "",
     "wascally": ""
-
   },
   "optionalDependencies": {
     "loopback-explorer": "^1.1.0"
