@@ -9,10 +9,14 @@ module.exports = function(server) {
             server.models.senz_app.create({
                 app_name: req.body.app_name,
                 app_key: uuid.v4(),
-                type: "",
+                type: "test",
                 user_id: req.body.developer_id
             }, function(err, model){
-                res.send(model);
+                if(err){
+                    res.send(err);
+                }else{
+                    res.send({appId: model.id});
+                }
             });
         }
     });
