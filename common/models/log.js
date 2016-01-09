@@ -85,6 +85,7 @@ module.exports = function(Log) {
                     if(!installation) return Promise.reject("Invalid InstallationId!");
 
                     return Promise.resolve({userId: installation.userId,
+                                            installationId: installationId,
                                             deviceType: installation.deviceType,
                                             logObj: LogObj});
                 },
@@ -98,6 +99,9 @@ module.exports = function(Log) {
 
     var process_rawLog = function(params){
         var object = params.logObj;
+        var installationId = params.installationId;
+        var deviceType = params.deviceType;
+
         var type = object.type;
         var pre_obj = {};
         var processed_obj = {};
@@ -114,7 +118,6 @@ module.exports = function(Log) {
                 processed_obj.user_id = params.userId;
                 processed_obj.userRawdataId = object.id;
                 processed_obj.timestamp = object.timestamp;
-                processed_obj.type = object.type;
                 url = 'http://119.254.111.40:3000/api/UserMotions';
                 if(type == "sensor") {
                     var sensor_array = object.value.events;
@@ -179,7 +182,7 @@ module.exports = function(Log) {
                 if(type == "calendar"){
                     processed_obj.calendarInfo = object.value;
                 }
-                return post_refined_log(url, processed_obj);
+                return post_refined_log(url, processed_obj, type, deviceType, installationId);
                 break;
             case "mic":
                 url += 'ForTests';
@@ -206,7 +209,7 @@ module.exports = function(Log) {
                     .then(
                         function(location_type){
                             location_type.user_id = params.userId;
-                            return post_refined_log(url, location_type);
+                            return post_refined_log(url, location_type, type, deviceType, installationId);
                         },
                         function(err){
                             logger.error(object.id, "UserLocation service requested in fail");
@@ -234,7 +237,7 @@ module.exports = function(Log) {
                         processed_obj.staticInfo = staticInfo;
                         processed_obj.timestamp = object.timestamp;
                         processed_obj.userRawdataId = object.id;
-                        return post_refined_log(url, processed_obj);
+                        return post_refined_log(url, processed_obj, type, deviceType, installationId);
                     },
                     function(err){
                         logger.error(object.id, "Static info service requested in fail");
@@ -247,12 +250,8 @@ module.exports = function(Log) {
         }
     };
 
-    var post_refined_log = function(url, object){
-        request.post(
-            {
-                url: url,
-                json: object
-            })
+    var post_refined_log = function(url, object, type, deviceType, installationId){
+        request.post({url: url, json: object})
             .then(
                 function(body) {
                     logger.debug(object.userRawdataId, "post RefinedLog success");
@@ -261,8 +260,7 @@ module.exports = function(Log) {
                 function(err){
                     logger.error(object.userRawdataId, "POST RefinedLog Failed!");
                     return Promise.reject(err);
-                }
-            )
+                })
     };
 
     var request_static_info = function(params){
@@ -388,41 +386,41 @@ module.exports = function(Log) {
                 }
             )
     };
-
-    var load_motion_data = function(body){
-        var params = {};
-        params["processStatus"] = "untreated";
-        params["motionProb"] = body.pred[0]; // todo check if given a list..
-        params["isTrainingSample"] = 0;
-        return params;
-    };
-
-    var request_motion_type = function(params){
-        var url = "https://api.trysenz.com/utils/motion_detector/";
-        logger.debug("", JSON.stringify(params));
-        logger.debug(params.objectId, "request motion type");
-        return request.post(
-            {
-                url: url,
-                headers:{
-                    "X-request-Id": params.objectId
-                },
-                json: params
-            })
-            .then(
-                function(body){
-                    var processed_data = load_motion_data(body);
-                    processed_data["timestamp"] = params.timestamp;
-                    processed_data["userRawdataId"] = params.objectId;
-                    processed_data["sensor_data"] = {"events":params.rawData};
-                    return Promise.resolve(processed_data);
-                },
-                function(err){
-                    logger.error(params.objectId, "motion service request error: " + JSON.stringify(err));
-                    return Promise.reject(err);
-                }
-            )
-    };
+    //
+    //var load_motion_data = function(body){
+    //    var params = {};
+    //    params["processStatus"] = "untreated";
+    //    params["motionProb"] = body.pred[0]; // todo check if given a list..
+    //    params["isTrainingSample"] = 0;
+    //    return params;
+    //};
+    //
+    //var request_motion_type = function(params){
+    //    var url = "https://api.trysenz.com/utils/motion_detector/";
+    //    logger.debug("", JSON.stringify(params));
+    //    logger.debug(params.objectId, "request motion type");
+    //    return request.post(
+    //        {
+    //            url: url,
+    //            headers:{
+    //                "X-request-Id": params.objectId
+    //            },
+    //            json: params
+    //        })
+    //        .then(
+    //            function(body){
+    //                var processed_data = load_motion_data(body);
+    //                processed_data["timestamp"] = params.timestamp;
+    //                processed_data["userRawdataId"] = params.objectId;
+    //                processed_data["sensor_data"] = {"events":params.rawData};
+    //                return Promise.resolve(processed_data);
+    //            },
+    //            function(err){
+    //                logger.error(params.objectId, "motion service request error: " + JSON.stringify(err));
+    //                return Promise.reject(err);
+    //            }
+    //        )
+    //};
 
     var processing_error = function(){
         log_cache.smembers('RawLog', function(e, log_list){
