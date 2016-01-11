@@ -16,19 +16,19 @@ app.use('/client', loopback.static(__dirname + '/../client'));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
-var upload = multer({dest: path.join(__dirname, '../storage')});
+//var upload = multer({dest: path.join(__dirname, '../storage')});
 
-app.get('/upload', function(req, res) {
-    res.render('upload.html');
-});
-var uploadOption = [{name: 'key', maxCount: 1}, {name: 'cert', maxCount: 1}];
-app.post('/upload', upload.fields(uploadOption), function(req, res){
-    //fs.readFile(req.file.path, function(e, d){
-    //    console.log(d);
-    //});
-    console.log(req);
-    res.status(204).end()
-});
+//app.get('/upload', function(req, res) {
+//    res.render('upload.html');
+//});
+//var uploadOption = [{name: 'key', maxCount: 1}, {name: 'cert', maxCount: 1}];
+//app.post('/upload', upload.fields(uploadOption), function(req, res){
+//    //fs.readFile(req.file.path, function(e, d){
+//    //    console.log(d);
+//    //});
+//    console.log(req);
+//    res.status(204).end()
+//});
 
 //var handler = new StorageService({provider: 'filesystem', root: path.join(__dirname, '../storage')});
 //

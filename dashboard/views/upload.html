@@ -5,9 +5,10 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post">
-        <!--CERT: <input type="file" name="cert"><br>-->
-        KEY: <input type="file" name="key"><br>
+    <form method="post" action='/upload/con1'>
+        CERT: <input type="file" name="cert" multiple="false"><br>
+        KEY: <input type="file" name="key" multiple="false"><br>
+        PASS: <input type="password" name="pass"><br>
         APPID: <input type="text" name="appId"><br>
         <input type="submit" name="submit">
     </form>

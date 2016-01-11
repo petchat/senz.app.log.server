@@ -1,11 +1,16 @@
 var log = require("../libraries/utils/logger").log;
 var logger = new log("<senz.app.log.server>");
 var apn = require("apn");
-
-var ios_apn_recorder = {};
+var Wilddog = require("wilddog");
+var base_url = "https://notify.wilddogio.com/";
+var android_message_ref = new Wilddog(base_url + "/message/");
 
 
 module.exports = function(UserCollectStrategy) {
+    var ios_apn_recorder = {};
+    var android_wilddog_recorder = {};
+    var default_expire = 5;
+
     UserCollectStrategy.pushToken = function(req, cb) {
         var installationId = req.installationId;
         var token = req.token;
@@ -18,82 +23,154 @@ module.exports = function(UserCollectStrategy) {
             strategy.save(function(e, d){
                 if(e){
                     return cb("update failed!");
+                }else{
+                    createApnConnection(installationId);
+                    return cb("", d);
                 }
-                return cb(e, d);
             });
         })
     };
 
-    UserCollectStrategy.uploadCert = function(req, cb){
-        console.log(req.fileUpload);
-        cb();
-    };
-
-    var get_userid_by_installationid = function(installationId){
-        Log.app.models.Installation.findOne({where: {id: installationId}})
+    var get_appid_by_installationid = function(installationId){
+        return UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}})
             .then(
                 function(installation){
                     if(!installation) return Promise.reject("Invalid InstallationId!");
-
-                    return Promise.resolve(installation.userId);
+                    logger.debug("get_appid_by_installationid", installation.appId);
+                    return Promise.resolve(installation.appId);
                 })
             .catch(function(e){
-                logger.error("get_userid_by_installationid", JSON.stringify(e));
+                logger.error("get_appid_by_installationid", JSON.stringify(e));
                 return Promise.reject(e);
             });
     };
 
-    var createConnection = function(installationId){
-        Log.app.models.UserCollectStrategy.findOne({where: {installationId: installationId}})
+    var createApnConnection = function(installationId){
+        return get_appid_by_installationid(installationId)
             .then(
-                function(strategy){
-                    if(!strategy || !strategy.token || !strategy.cert || !strategy.key){
-                        return Promise.reject(strategy);
+                function(appId){
+                    return Promise.all([UserCollectStrategy.findOne({where: {installationId: installationId}}),
+                                        UserCollectStrategy.app.models.senz_app.findOne({where: {id: appId}})])
+                })
+            .then(
+                function(result){
+                    var strategy = result[0];
+                    var senz_app = result[1];
+
+                    if(!strategy || !strategy.token || !senz_app || !senz_app.cert || !senz_app.key){
+                        return Promise.reject(result);
                     }
 
                     if(!strategy.device){
                         strategy.device = new apn.Device(strategy.token);
                     }
 
-                    if(!strategy.expire){
-                        strategy.expire = 10*60;
-                    }
+                    strategy.expire = strategy.expire_init || default_expire;
 
                     strategy.apnConnection_prod = new apn.Connection({
                         cert: strategy.cert,
                         key: strategy.key,
                         production: true,
-                        passphrase: strategy.passpharse
+                        passphrase: senz_app.cert_pass
                     });
                     strategy.apnConnection_dev = new apn.Connection({
                         cert: strategy.cert,
                         key: strategy.key,
                         production: false,
-                        passphrase: strategy.passpharse
+                        passphrase: senz_app.cert_pass
                     });
 
-                    strategy.save();
-                    ios_apn_recorder[installationId] = strategy;
+                    strategy.save(function(e, d){
+                        ios_apn_recorder[installationId] = strategy;
+                    });
+
+                    logger.info("createConnection", JSON.stringify(strategy));
                 })
             .catch(
                 function(e){
-                    logger.error("createConnection", JSON.stringify(e));
                     return Promise.reject(e);
                 });
     };
+
+    var pushApnMessage = function(installationId, msg){
+        if(!ios_apn_recorder[installationId]) return;
+
+        var apnConnection_prod = ios_apn_recorder[installationId].apnConnection_prod;
+        var apnConnection_dev = ios_apn_recorder[installationId].apnConnection_dev;
+        var device = ios_apn_recorder[installationId].device;
+
+        var note = new apn.Notification();
+        note.contentAvailable = 1;
+        note.payload = {
+            "senz-sdk-notify": msg
+        };
+
+        if(apnConnection_dev && device){
+            apnConnection_dev.pushNotification(note, device);
+        }
+        if(apnConnection_prod && device){
+            apnConnection_prod.pushNotification(note, device);
+        }
+    };
+
+    var pushAndroidMessage = function(installationId, msg){
+        var collect_data = android_message_ref.child(installationId).child("collect_data");
+        collect_data.set(Math.random(), function(err){
+            if(err){
+                logger.error("pushAndroidMessage", JSON.stringify(err));
+            }else{
+                logger.info("pushAndroidMessage", installationId, "push success!");
+            }
+        })
+    };
+
+    var maintainFlag = function(){
+        Object.keys(ios_apn_recorder).forEach(function(installationId){
+            console.log(ios_apn_recorder[installationId]);
+            ios_apn_recorder[installationId].expire -= 1;
+            if(ios_apn_recorder[installationId].expire <= 0){
+                var msg = {"type": "collect-data"};
+
+                pushApnMessage(installationId, msg);
+                ios_apn_recorder[installationId].expire =
+                    ios_apn_recorder[installationId].expire_init || default_expire;
+            }
+        });
+
+        Object.keys(android_wilddog_recorder).forEach(function(installationId){
+            console.log(installationId);
+            android_wilddog_recorder[installationId].expire -= 1;
+            if(android_wilddog_recorder[installationId].expire <= 0){
+                pushAndroidMessage(installationId, {});
+                android_wilddog_recorder[installationId].expire =
+                    android_wilddog_recorder[installationId].expire_init || default_expire;
+            }
+        });
+        logger.debug("maintainFlag", "Timer Schedule!");
+    };
+
+    var connOnBoot = function(){
+        return UserCollectStrategy.app.models.Installation.find({})
+            .then(
+                function(installations){
+                    installations.forEach(function(item){
+                        if(item.deviceType == "android"){
+                            android_wilddog_recorder[item.id] = {};
+                            android_wilddog_recorder[item.id].expire = 6;
+                        }else if(item.deviceType == "ios"){
+                            createApnConnection(item.id);
+                        }
+                    })
+                })
+    };
+
+    setInterval(maintainFlag, 1000);
+    setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
         "pushToken",
         {
             accepts: {arg: "body", type: "object", http: {source: "body"}},
-            returns: {arg: "result", type: "object"}
-        }
-    );
-    UserCollectStrategy.remoteMethod(
-        "uploadCert",
-        {
-            http: {path: "/uploadCert", verb: "post"},
-            accepts: {arg: "body", type: "object"},
             returns: {arg: "result", type: "object"}
         }
     );
