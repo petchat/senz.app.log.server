@@ -1,10 +1,4 @@
 {
-  "local_file_system": {
-    "name": "local_file_system",
-    "connector": "loopback-component-storage",
-    "provider": "filesystem",
-    "root": "./storage"
-  },
   "qingcloud1-mongodb": {
     "host": "119.254.111.40",
     "port": 27017,
