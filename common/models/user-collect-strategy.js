@@ -160,7 +160,6 @@ module.exports = function(UserCollectStrategy) {
         });
 
         Object.keys(android_wilddog_recorder).forEach(function(installationId){
-            console.log(installationId);
             android_wilddog_recorder[installationId].expire -= 1;
             if(android_wilddog_recorder[installationId].expire <= 0){
                 pushAndroidMessage(installationId, {"type": "collect_data", "content": Math.random()});
@@ -173,7 +172,6 @@ module.exports = function(UserCollectStrategy) {
 
     var connOnBoot = function(){
         UserCollectStrategy.app.models.Installation.find({}, function(e, installations){
-            console.log(installations);
             installations.forEach(function(item){
                 if(item.deviceType == "android"){
                     android_wilddog_recorder[item.id] = {};
