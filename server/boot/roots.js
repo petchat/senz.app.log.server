@@ -66,6 +66,8 @@ module.exports = function(server) {
             if (err) return res.status(500).send(err);
 
             handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
+                if(e) return res.send({msg: "upload failed!"});
+
                 var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
                 var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
                 fs.readFile(certpath, function(e, cert){
