@@ -7,8 +7,27 @@ var handler = new StorageService({provider: 'filesystem', root: path.join(__dirn
 module.exports = function(server) {
     var router = server.loopback.Router();
 
+    router.use('/signup', function(req, res){
+        if(req.method == 'GET') res.render('signup.html');
+
+        if(req.method == 'POST') {
+            var email = req.body.email;
+            var password1 = req.body.password1;
+            var password2 = req.body.password2;
+            if(!password1 || !password2 || (password1 != password2)){
+                return res.status(400).send("Twice Password are not equal!");
+            }
+            server.models.Developer.create({email: email, password: password1}, function(err, user){
+                if(err){
+                    return res.status(400).send("Create Developer Failed!")
+                }
+                return res.send(user);
+            });
+        }
+    });
+
     router.use('/createApp', function (req, res) {
-        if(req.method == 'GET') res.render('index.html');
+        if(req.method == 'GET') res.render('create_app.html');
         if(req.method == 'POST') {
             server.models.senz_app.create({
                 app_name: req.body.app_name,

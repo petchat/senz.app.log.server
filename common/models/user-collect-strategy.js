@@ -22,13 +22,33 @@ module.exports = function(UserCollectStrategy) {
             strategy.token = token;
             strategy.save(function(e, d){
                 if(e){
-                    return cb("update failed!");
+                    return cb("pushToken failed!");
                 }else{
                     createApnConnection(installationId);
                     return cb("", d);
                 }
             });
         })
+    };
+
+    UserCollectStrategy.pushApnMessage = function(req, cb){
+        var installationId = req.installationId;
+        if(!installationId){
+            return cb("", "InstallationId Must be NonEmpty!")
+        }
+        var msg = {"type": req.type, "content": req.content};
+        pushApnMessage(installationId, msg);
+        return cb("", "pushApnMessage Success!");
+    };
+
+    UserCollectStrategy.pushAndroidMessage = function(req, cb){
+        var installationId = req.installationId;
+        if(!installationId){
+           return cb("", "InstallationId Must be NonEmpty!")
+        }
+        var msg = {"type": req.type, "content": req.content};
+        pushAndroidMessage(installationId, msg);
+        return cb("", "pushAndroidMessage Success!");
     };
 
     var get_appid_by_installationid = function(installationId){
@@ -114,12 +134,14 @@ module.exports = function(UserCollectStrategy) {
     };
 
     var pushAndroidMessage = function(installationId, msg){
-        var collect_data = android_message_ref.child(installationId).child("collect_data");
-        collect_data.set(Math.random(), function(err){
+        var type = msg.type || "collect_data";
+        var content = msg.content || Math.random();
+        var collect_data = android_message_ref.child(installationId).child(type);
+        collect_data.set(content, function(err){
             if(err){
                 logger.error("pushAndroidMessage", JSON.stringify(err));
             }else{
-                logger.info("pushAndroidMessage", installationId, "push success!");
+                logger.info("pushAndroidMessage", installationId + ": push success!");
             }
         })
     };
@@ -129,7 +151,7 @@ module.exports = function(UserCollectStrategy) {
             console.log(ios_apn_recorder[installationId]);
             ios_apn_recorder[installationId].expire -= 1;
             if(ios_apn_recorder[installationId].expire <= 0){
-                var msg = {"type": "collect-data"};
+                var msg = {"type": "collect_data"};
 
                 pushApnMessage(installationId, msg);
                 ios_apn_recorder[installationId].expire =
@@ -141,7 +163,7 @@ module.exports = function(UserCollectStrategy) {
             console.log(installationId);
             android_wilddog_recorder[installationId].expire -= 1;
             if(android_wilddog_recorder[installationId].expire <= 0){
-                pushAndroidMessage(installationId, {});
+                pushAndroidMessage(installationId, {"type": "collect_data", "content": Math.random()});
                 android_wilddog_recorder[installationId].expire =
                     android_wilddog_recorder[installationId].expire_init || default_expire;
             }
@@ -164,11 +186,25 @@ module.exports = function(UserCollectStrategy) {
                 })
     };
 
-    setInterval(maintainFlag, 1000);
+    //setInterval(maintainFlag, 1000);
     setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
         "pushToken",
+        {
+            accepts: {arg: "body", type: "object", http: {source: "body"}},
+            returns: {arg: "result", type: "object"}
+        }
+    );
+    UserCollectStrategy.remoteMethod(
+        "pushApnMessage",
+        {
+            accepts: {arg: "body", type: "object", http: {source: "body"}},
+            returns: {arg: "result", type: "object"}
+        }
+    );
+    UserCollectStrategy.remoteMethod(
+        "pushAndroidMessage",
         {
             accepts: {arg: "body", type: "object", http: {source: "body"}},
             returns: {arg: "result", type: "object"}
