@@ -61,29 +61,27 @@ module.exports = function(server) {
 
     router.post('/uploadCert/:container', function(req, res) {
         handler.upload(req, res, function(err, result) {
-            if (!err) {
-                handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
-                    var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
-                    var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
-                    fs.readFile(certpath, function(e, cert){
-                        fs.readFile(keypath, function(e, key){
-                            server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
-                                model.cert = cert;
-                                model.key = key;
-                                model.cert_pass = result.fields.pass[0];
-                                model.save(function(e, d){
-                                    if(e){
-                                        return res.send("upload failed!");
-                                    }
-                                    return res.send("upload success!");
-                                })
+            if (err) return res.status(500).send(err);
+
+            handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
+                var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
+                var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
+                fs.readFile(certpath, function(e, cert){
+                    fs.readFile(keypath, function(e, key){
+                        server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
+                            model.cert = cert;
+                            model.key = key;
+                            model.cert_pass = result.fields.pass[0];
+                            model.save(function(e, d){
+                                if(e){
+                                    return res.send({msg: "upload failed!"});
+                                }
+                                return res.send({msg: "upload success!"});
                             })
-                        });
-                    })
-                });
-            } else {
-                res.status(500).send(err);
-            }
+                        })
+                    });
+                })
+            });
         });
     });
 
