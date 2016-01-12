@@ -179,22 +179,32 @@ module.exports = function(UserCollectStrategy) {
         console.log("##########################")
         console.log(UserCollectStrategy.app.models.Installation);
         console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-        return UserCollectStrategy.app.models.Installation.find({})
-            .then(
-                function(installations){
-                    console.log(installations);
-                    installations.forEach(function(item){
-                        if(item.deviceType == "android"){
-                            android_wilddog_recorder[item.id] = {};
-                            android_wilddog_recorder[item.id].expire = 6;
-                        }else if(item.deviceType == "ios"){
-                            createApnConnection(item.id);
-                        }
-                    })
-                })
-            .catch(function(e){
-                console.error(e);
+        return UserCollectStrategy.app.models.Installation.find({}, function(e, installations){
+            console.log(installations);
+            installations.forEach(function(item){
+                if(item.deviceType == "android"){
+                    android_wilddog_recorder[item.id] = {};
+                    android_wilddog_recorder[item.id].expire = 6;
+                }else if(item.deviceType == "ios"){
+                    createApnConnection(item.id);
+                }
             })
+        });
+            //.then(
+            //    function(installations){
+            //        console.log(installations);
+            //        installations.forEach(function(item){
+            //            if(item.deviceType == "android"){
+            //                android_wilddog_recorder[item.id] = {};
+            //                android_wilddog_recorder[item.id].expire = 6;
+            //            }else if(item.deviceType == "ios"){
+            //                createApnConnection(item.id);
+            //            }
+            //        })
+            //    })
+            //.catch(function(e){
+            //    console.error(e);
+            //})
     };
 
     setInterval(maintainFlag, 1000);
