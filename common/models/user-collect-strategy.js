@@ -172,13 +172,13 @@ module.exports = function(UserCollectStrategy) {
     };
 
     var connOnBoot = function(){
-        console.log("##########################")
+        console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         console.log(UserCollectStrategy);
-        console.log("##########################")
+        console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@")
         console.log(UserCollectStrategy.app);
         console.log("##########################")
         console.log(UserCollectStrategy.app.models.Installation);
-        console.log("##########################")
+        console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
         return UserCollectStrategy.app.models.Installation.find({})
             .then(
                 function(installations){
