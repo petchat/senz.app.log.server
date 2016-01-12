@@ -6,6 +6,7 @@ var handler = new StorageService({provider: 'filesystem', root: path.join(__dirn
 
 module.exports = function(server) {
     var router = server.loopback.Router();
+    router.get('/', server.loopback.status());
 
     router.use('/signup', function(req, res){
         if(req.method == 'GET') res.render('signup.html');
