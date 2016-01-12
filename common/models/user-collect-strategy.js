@@ -185,6 +185,9 @@ module.exports = function(UserCollectStrategy) {
                         }
                     })
                 })
+            .catch(function(e){
+                console.error(e);
+            })
     };
 
     setInterval(maintainFlag, 1000);
