@@ -59,7 +59,6 @@ module.exports = function(server) {
             + "<input type=submit value=Upload></form>" +
             "</body></html>";
         res.send(form);
-        res.end();
     });
 
     router.post('/uploadCert/:container', function(req, res) {
