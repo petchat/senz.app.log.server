@@ -45,10 +45,10 @@ module.exports = function(server) {
         }
     });
 
-    router.get('/upload', function(req, res) {
+    router.get('/uploadCert', function(req, res) {
         res.setHeader('Content-Type', 'text/html');
         var form =
-            "<form method='POST' enctype='multipart/form-data' action='/upload/con1'>"
+            "<form method='POST' enctype='multipart/form-data' action='/uploadCert/con1'>"
             + "Cert: <input type=file name=cert multiple=false><br>"
             + "Key: <input type=file name=key multiple=false><br>"
             + "PASS: <input type=password name=pass ><br>"
@@ -59,7 +59,7 @@ module.exports = function(server) {
         res.end();
     });
 
-    router.post('/upload/:container', function(req, res) {
+    router.post('/uploadCert/:container', function(req, res) {
         handler.upload(req, res, function(err, result) {
             if (!err) {
                 handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
