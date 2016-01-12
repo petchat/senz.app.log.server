@@ -29,7 +29,7 @@
     "uuid": "",
     "apn": "",
     "path": "",
-    "mkdirp": "",
+    "mkdirpd": "",
     "wilddog": "^0.4.5",
     "wascally": ""
   },

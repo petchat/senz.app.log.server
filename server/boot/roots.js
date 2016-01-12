@@ -1,6 +1,7 @@
 var uuid = require("uuid");
 var path = require("path");
 var fs = require('fs');
+var mkdir = require("mkdirpd");
 var StorageService = require("loopback-component-storage").StorageService;
 var handler = new StorageService({provider: 'filesystem', root: path.join(__dirname, '../../storage')});
 
@@ -45,10 +46,12 @@ module.exports = function(server) {
         }
     });
 
-    router.get('/uploadCert', function(req, res) {
+    router.get('/uploadCert/:appId', function(req, res) {
         res.setHeader('Content-Type', 'text/html');
+        var action = '/uploadCert/'+ req.params.appId;
+        mkdir(path.join(__dirname, '../../storage', req.params.appId));
         var form =
-            "<form method='POST' enctype='multipart/form-data' action='/uploadCert/con1'>"
+            "<form method='POST' enctype='multipart/form-data' action=" + action + ">"
             + "Cert: <input type=file name=cert multiple=false><br>"
             + "Key: <input type=file name=key multiple=false><br>"
             + "PASS: <input type=password name=pass ><br>"
