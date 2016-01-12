@@ -44,7 +44,7 @@ module.exports = function(server) {
         }
     });
 
-    router.get('/upload/:container', function(req, res) {
+    router.get('/upload', function(req, res) {
         res.setHeader('Content-Type', 'text/html');
         var form =
             "<form method='POST' enctype='multipart/form-data' action='/upload/con1'>"
