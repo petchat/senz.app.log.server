@@ -186,7 +186,7 @@ module.exports = function(UserCollectStrategy) {
                 })
     };
 
-    //setInterval(maintainFlag, 1000);
+    setInterval(maintainFlag, 1000);
     setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
