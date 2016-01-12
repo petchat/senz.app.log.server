@@ -58,7 +58,7 @@ module.exports = function(server) {
             + "AppId: <input type=text name=appId><br>"
             + "<input type=submit value=Upload></form>" +
             "</body></html>";
-        res.send(form);
+        return res.send(form);
     });
 
     router.post('/uploadCert/:container', function(req, res) {
