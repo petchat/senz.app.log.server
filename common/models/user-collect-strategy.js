@@ -175,6 +175,7 @@ module.exports = function(UserCollectStrategy) {
         return UserCollectStrategy.app.models.Installation.find({})
             .then(
                 function(installations){
+                    console.log(installations);
                     installations.forEach(function(item){
                         if(item.deviceType == "android"){
                             android_wilddog_recorder[item.id] = {};
