@@ -5,11 +5,11 @@
     <title>Title</title>
 </head>
 <body>
-    <form method="post" action='/upload/con1'>
-        CERT: <input type="file" name="cert" multiple="false"><br>
-        KEY: <input type="file" name="key" multiple="false"><br>
+    <form method="post" action="" enctype='multipart/form-data'>
+        CERT: <input type="file" name="cert" multiple="false" required><br>
+        KEY: <input type="file" name="key" multiple="false" required><br>
         PASS: <input type="password" name="pass"><br>
-        APPID: <input type="text" name="appId"><br>
+        APPID: <input type="text" name="appId" required><br>
         <input type="submit" name="submit">
     </form>
 </body>

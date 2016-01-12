@@ -46,47 +46,44 @@ module.exports = function(server) {
         }
     });
 
-    router.get('/uploadCert/:appId', function(req, res) {
-        res.setHeader('Content-Type', 'text/html');
-        var action = '/uploadCert/'+ req.params.appId;
-        mkdir(path.join(__dirname, '../../storage', req.params.appId));
-        var form =
-            "<form method='POST' enctype='multipart/form-data' action=" + action + ">"
-            + "Cert: <input type=file name=cert multiple=false><br>"
-            + "Key: <input type=file name=key multiple=false><br>"
-            + "PASS: <input type=password name=pass ><br>"
-            + "AppId: <input type=text name=appId><br>"
-            + "<input type=submit value=Upload></form>" +
-            "</body></html>";
-        return res.send(form);
-    });
 
-    router.post('/uploadCert/:container', function(req, res) {
-        handler.upload(req, res, function(err, result) {
-            if (err) return res.status(500).send(err);
+    router.use('/uploadCert/:container', function(req, res){
+        if(req.method == 'GET'){
+            console.log("###################");
+            mkdir(path.join(__dirname, '../../storage', req.params.container));
+            return res.render("upload.html");
+        }
 
-            handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
-                if(e) return res.send({msg: "upload failed!"});
+        if(req.method == 'POST'){
+            handler.upload(req, res, function(err, result) {
+                if (err) return res.status(500).send(err);
 
-                var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
-                var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
-                fs.readFile(certpath, function(e, cert){
-                    fs.readFile(keypath, function(e, key){
-                        server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
-                            model.cert = cert;
-                            model.key = key;
-                            model.cert_pass = result.fields.pass[0];
-                            model.save(function(e, d){
-                                if(e){
-                                    return res.send({msg: "upload failed!"});
+                handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
+                    if(e) return res.send({msg: "upload failed!"});
+
+                    var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
+                    var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
+                    fs.readFile(certpath, function(e, cert){
+                        fs.readFile(keypath, function(e, key){
+                            server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
+                                if(err || !model){
+                                    return res.send({msg: "Invalid appId!"})
                                 }
-                                return res.send({msg: "upload success!"});
+                                model.cert = cert;
+                                model.key = key;
+                                model.cert_pass = result.fields.pass[0];
+                                model.save(function(e, d){
+                                    if(e){
+                                        return res.send({msg: "upload failed!"});
+                                    }
+                                    return res.send({msg: "upload success!"});
+                                })
                             })
-                        })
-                    });
-                })
+                        });
+                    })
+                });
             });
-        });
+        }
     });
 
     server.use(router);
