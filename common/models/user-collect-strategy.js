@@ -51,6 +51,33 @@ module.exports = function(UserCollectStrategy) {
         return cb("", "pushAndroidMessage Success!");
     };
 
+    UserCollectStrategy.pushCollectStrategy= function(req, cb){
+        var installationId = req.installationId;
+        if(!installationId){
+            return cb("", "InstallationId Must be NonEmpty!")
+        }
+        UserCollectStrategy.findOne({where: {installationId: installationId}}, function(e, collect_strategy){
+            if(e) return cb(e, "Invalid InstallationId!");
+
+            if(!collect_strategy){
+                UserCollectStrategy.create({
+                    installationId: installationId,
+                    expire_init: req.expire
+                }, function(e, d){
+                    return cb(e, d);
+                })
+            }
+
+            collect_strategy.expire_init = req.expire;
+            collect_strategy.save(function(e){
+                if(e) return cb(e, "Update CollectStrategy Failed!");
+
+                ios_apn_recorder[installationId] = collect_strategy;
+                return cb(e, "Update CollectStrategy Success!");
+            });
+        });
+    };
+
     var get_appid_by_installationid = function(installationId){
         return UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}})
             .then(
@@ -183,7 +210,7 @@ module.exports = function(UserCollectStrategy) {
         });
     };
 
-    setInterval(maintainFlag, 1000);
+    setInterval(maintainFlag, 10000);
     setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
@@ -202,6 +229,13 @@ module.exports = function(UserCollectStrategy) {
     );
     UserCollectStrategy.remoteMethod(
         "pushAndroidMessage",
+        {
+            accepts: {arg: "body", type: "object", http: {source: "body"}},
+            returns: {arg: "result", type: "object"}
+        }
+    );
+    UserCollectStrategy.remoteMethod(
+        "pushCollectStrategy",
         {
             accepts: {arg: "body", type: "object", http: {source: "body"}},
             returns: {arg: "result", type: "object"}
