@@ -60,13 +60,13 @@ module.exports = function(UserCollectStrategy) {
             if(e) return cb(e, "Invalid InstallationId!");
 
             if(!collect_strategy){
-                UserCollectStrategy.app.models.Installation.findOne({where: {installationId: installationId}}, function(e, installation){
+                UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
                     UserCollectStrategy.create({
                         installationId: installationId,
                         expire_init: req.expire,
+                        expire: req.expire,
                         deviceType: installation.deviceType
                     }, function(e, d){
-
                         if(installation.deviceType == "ios"){
                             ios_apn_recorder[installationId] = d;
                         }else if(installation.deviceType == "android"){
@@ -76,20 +76,21 @@ module.exports = function(UserCollectStrategy) {
                         return cb(e, "Updated CollectStrategy");
                     })
                 });
+            }else{
+                collect_strategy.expire_init = req.expire;
+                collect_strategy.expire = req.expire;
+                collect_strategy.save(function(e){
+                    if(e) return cb(e, "Update CollectStrategy Failed!");
+
+                    if(collect_strategy.deviceType == "ios"){
+                        ios_apn_recorder[installationId] = collect_strategy;
+                    }else if(collect_strategy.deviceType == "android"){
+                        android_wilddog_recorder[installationId] = collect_strategy;
+                    }
+
+                    return cb(e, "Update CollectStrategy Success!");
+                });
             }
-
-            collect_strategy.expire_init = req.expire;
-            collect_strategy.save(function(e){
-                if(e) return cb(e, "Update CollectStrategy Failed!");
-
-                if(collect_strategy.deviceType == "ios"){
-                    ios_apn_recorder[installationId] = collect_strategy;
-                }else if(collect_strategy.deviceType == "android"){
-                    android_wilddog_recorder[installationId] = collect_strategy;
-                }
-
-                return cb(e, "Update CollectStrategy Success!");
-            });
         });
     };
 
@@ -217,7 +218,7 @@ module.exports = function(UserCollectStrategy) {
             installations.forEach(function(item){
                 if(item.deviceType == "android"){
                     android_wilddog_recorder[item.id] = {};
-                    android_wilddog_recorder[item.id].expire = 6;
+                    android_wilddog_recorder[item.id].expire = default_expire;
                 }else if(item.deviceType == "ios"){
                     createApnConnection(item.id);
                 }
