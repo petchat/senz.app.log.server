@@ -214,13 +214,20 @@ module.exports = function(UserCollectStrategy) {
     };
 
     var connOnBoot = function(){
-        UserCollectStrategy.app.models.Installation.find({}, function(e, installations){
-            installations.forEach(function(item){
-                if(item.deviceType == "android"){
-                    android_wilddog_recorder[item.id] = {};
-                    android_wilddog_recorder[item.id].expire = default_expire;
-                }else if(item.deviceType == "ios"){
-                    createApnConnection(item.id);
+        UserCollectStrategy.app.models.Installation.find({order: 'updatedAt DESC'}, function(e, installations){
+            var remove_dup = {};
+            installations.forEach(function(d){
+                if(!remove_dup[d.userId]){
+                    remove_dup[d.userId] = d;
+                }
+            });
+            Object.keys(remove_dup).forEach(function(item){
+                var installation = remove_dup[item];
+                if(installation.deviceType == "android"){
+                    android_wilddog_recorder[installation.id] = {};
+                    android_wilddog_recorder[installation.id].expire = default_expire;
+                }else if(installation.deviceType == "ios"){
+                    createApnConnection(installation.id);
                 }
             })
         });
