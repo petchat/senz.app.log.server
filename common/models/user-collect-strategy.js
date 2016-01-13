@@ -73,7 +73,7 @@ module.exports = function(UserCollectStrategy) {
                             android_wilddog_recorder[installationId] = d;
                         }
 
-                        return cb(e, d);
+                        return cb(e, "Updated CollectStrategy");
                     })
                 });
             }
