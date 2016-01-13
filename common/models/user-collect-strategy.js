@@ -60,19 +60,34 @@ module.exports = function(UserCollectStrategy) {
             if(e) return cb(e, "Invalid InstallationId!");
 
             if(!collect_strategy){
-                UserCollectStrategy.create({
-                    installationId: installationId,
-                    expire_init: req.expire
-                }, function(e, d){
-                    return cb(e, d);
-                })
+                UserCollectStrategy.app.models.Installation.findOne({where: {installationId: installationId}}, function(e, installation){
+                    UserCollectStrategy.create({
+                        installationId: installationId,
+                        expire_init: req.expire,
+                        deviceType: installation.deviceType
+                    }, function(e, d){
+
+                        if(installation.deviceType == "ios"){
+                            ios_apn_recorder[installationId] = d;
+                        }else if(installation.deviceType == "android"){
+                            android_wilddog_recorder[installationId] = d;
+                        }
+
+                        return cb(e, d);
+                    })
+                });
             }
 
             collect_strategy.expire_init = req.expire;
             collect_strategy.save(function(e){
                 if(e) return cb(e, "Update CollectStrategy Failed!");
 
-                ios_apn_recorder[installationId] = collect_strategy;
+                if(collect_strategy.deviceType == "ios"){
+                    ios_apn_recorder[installationId] = collect_strategy;
+                }else if(collect_strategy.deviceType == "android"){
+                    android_wilddog_recorder[installationId] = collect_strategy;
+                }
+
                 return cb(e, "Update CollectStrategy Success!");
             });
         });
