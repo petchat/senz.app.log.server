@@ -34,15 +34,13 @@ module.exports = function(Installation) {
                     "deviceType": deviceType,
                     "deviceToken": uuid.v4()
                 }, function(err, model){
-                    cb(err, model);
-                    return Promise.resolve(model);
+                    return cb(err, model);
                 })
             })
         .catch(
             function(err){
                 logger.error(hardwareId, err);
-                cb(err);
-                return Promise.reject(err);
+                return cb(err);
             }
         );
     };

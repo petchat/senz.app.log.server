@@ -75,7 +75,7 @@ module.exports = function(server) {
                                     if(e){
                                         return res.send({msg: "upload failed!"});
                                     }
-                                    return res.send({msg: "upload success!"});
+                                    return res.send({msg: "upload success!"}).end();
                                 })
                             })
                         });
