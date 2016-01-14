@@ -182,7 +182,7 @@ module.exports = function(Log) {
                 if(type == "calendar"){
                     processed_obj.calendarInfo = object.value;
                 }
-                return post_refined_log(url, processed_obj, type, deviceType, installationId);
+                return post_refined_log(url, processed_obj, "motion", deviceType, installationId);
                 break;
             case "mic":
                 url += 'ForTests';
@@ -254,13 +254,21 @@ module.exports = function(Log) {
         request.post({url: url, json: object})
             .then(
                 function(body) {
-                    logger.debug(object.userRawdataId, "post RefinedLog success");
+                    logger.debug("post_refined_log", object.userRawdataId + ": post RefinedLog success");
                     return Promise.resolve(body);
-                },
-                function(err){
-                    logger.error(object.userRawdataId, "POST RefinedLog Failed!");
-                    return Promise.reject(err);
                 })
+            .then(
+                function(){
+                    var content = "";
+                    if(type == "motion"){
+                        content = Object.keys(object.motionProb).sort(function(a,b){return object.motionProb[a]-object.motionProb[b]});
+                    }
+                })
+            .catch(
+                function(err){
+                    logger.error("post_refined_log", object.userRawdataId + ": POST RefinedLog Failed!");
+                    return Promise.reject(err);
+                });
     };
 
     var request_static_info = function(params){

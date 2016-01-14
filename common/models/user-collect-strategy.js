@@ -16,18 +16,37 @@ module.exports = function(UserCollectStrategy) {
         var token = req.token;
         UserCollectStrategy.findOne({where: {installationId: installationId}}, function(e, strategy){
             if(e || !strategy){
-                return cb("Invalid installationId!");
+                UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
+                    if(e || !installation){
+                        return cb(e, "Invalid installationId!");
+                    }else{
+                        UserCollectStrategy.create({
+                            installationId: installationId,
+                            expire_init: default_expire,
+                            expire: default_expire,
+                            deviceType: installation.deviceType,
+                            token: token
+                        }, function(e, d){
+                            if(installation.deviceType == "ios"){
+                                ios_apn_recorder[installationId] = d;
+                            }else if(installation.deviceType == "android"){
+                                android_wilddog_recorder[installationId] = d;
+                            }
+                            return cb(e, "Push Token Success!");
+                        })
+                    }
+                });
+            }else{
+                strategy.token = token;
+                strategy.save(function(e, d){
+                    if(e){
+                        return cb(e, "pushToken failed!");
+                    }else{
+                        createApnConnection(installationId);
+                        return cb("", "Push Token Success!");
+                    }
+                });
             }
-
-            strategy.token = token;
-            strategy.save(function(e, d){
-                if(e){
-                    return cb("pushToken failed!");
-                }else{
-                    createApnConnection(installationId);
-                    return cb("", d);
-                }
-            });
         })
     };
 
@@ -147,7 +166,7 @@ module.exports = function(UserCollectStrategy) {
                         ios_apn_recorder[installationId] = strategy;
                     });
 
-                    logger.info("createConnection", JSON.stringify(strategy));
+                    logger.info("createConnection", "Create Connection Success!");
                 })
             .catch(
                 function(e){
@@ -191,7 +210,6 @@ module.exports = function(UserCollectStrategy) {
 
     var maintainFlag = function(){
         Object.keys(ios_apn_recorder).forEach(function(installationId){
-            console.log(ios_apn_recorder[installationId]);
             ios_apn_recorder[installationId].expire -= 1;
             if(ios_apn_recorder[installationId].expire <= 0){
                 var msg = {"type": "collect_data"};
