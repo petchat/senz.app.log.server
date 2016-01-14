@@ -175,6 +175,8 @@ module.exports = function(UserCollectStrategy) {
     };
 
     var pushApnMessage = function(installationId, msg){
+        logger.debug("pushApnMessage_prod", "installationId: " + installationId);
+
         if(!ios_apn_recorder[installationId]) return;
 
         var apnConnection_prod = ios_apn_recorder[installationId].apnConnection_prod;
