@@ -188,9 +188,11 @@ module.exports = function(UserCollectStrategy) {
         };
 
         if(apnConnection_dev && device){
+            logger.debug("pushApnMessage_dev", JSON.stringify(note));
             apnConnection_dev.pushNotification(note, device);
         }
         if(apnConnection_prod && device){
+            logger.debug("pushApnMessage_prod", JSON.stringify(note));
             apnConnection_prod.pushNotification(note, device);
         }
     };
