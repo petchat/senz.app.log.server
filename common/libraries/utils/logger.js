@@ -17,10 +17,10 @@ var log = function(log_tag) {
     }
     else {
         if(process.env.APP_ENV === "prod"){
-            var token = "0e58e820-ec05-46a3-98ee-ba31f16e301c"
+            var token = "a904d044-0019-4bb9-b0cc-74a78e6cc50d"
         }
         else{
-            var token = '52f63fc6-4162-46a9-839b-4977f64dc11f'
+            var token = 'a904d044-0019-4bb9-b0cc-74a78e6cc50d'
         }
             var logentries = require('node-logentries');
         var log = logentries.logger({
