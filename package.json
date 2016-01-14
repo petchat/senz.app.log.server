@@ -21,6 +21,7 @@
     "mongodb": "2.0.42",
     "redis": "",
     "request-promise": "",
+    "node-logentries": "",
     "sendcloud": "",
     "serve-favicon": "^2.0.1",
     "string": "",
