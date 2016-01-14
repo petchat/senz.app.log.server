@@ -117,8 +117,7 @@ module.exports = function(UserCollectStrategy) {
         UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}},
             function(e, installation){
                 if(!e && installation){
-                    logger.debug("get_appid_by_installationid", installation.appId);
-                    console.log(installation.id);
+                    logger.debug("createApnConnection", "appId: " + installation.appId);
                     UserCollectStrategy.findOne({installationId: installation.id},
                         function(e, strategy){
                         if(e || !strategy || !strategy.token){
