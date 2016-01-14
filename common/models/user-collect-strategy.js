@@ -238,8 +238,8 @@ module.exports = function(UserCollectStrategy) {
         });
     };
 
-    //setInterval(maintainFlag, 10000);
-    //setTimeout(connOnBoot, 0);
+    setInterval(maintainFlag, 10000);
+    setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
         "pushToken",
