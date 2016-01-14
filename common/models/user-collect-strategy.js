@@ -239,7 +239,7 @@ module.exports = function(UserCollectStrategy) {
     };
 
     setInterval(maintainFlag, 10000);
-    setTimeout(connOnBoot, 0);
+    setTimeout(connOnBoot, 100);
 
     UserCollectStrategy.remoteMethod(
         "pushToken",

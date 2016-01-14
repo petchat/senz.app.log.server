@@ -54,7 +54,11 @@ module.exports = function(server) {
         }
 
         if(req.method == 'POST'){
-            handler.upload(req, res, function(err, result) {
+            handler.upload(req, res, {getFilename: function(fileInfo, req, res){
+                console.log(fileInfo);
+                console.log(req.getFilename);
+                return "a";
+            }}, function(err, result) {
                 if (err) return res.status(500).send(err);
 
                 handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
