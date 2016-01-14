@@ -214,6 +214,7 @@ module.exports = function(UserCollectStrategy) {
 
     var maintainFlag = function(){
         Object.keys(ios_apn_recorder).forEach(function(installationId){
+            logger.debug("maintainFlag", "installationId: "+installationId);
             ios_apn_recorder[installationId].expire -= 1;
             if(ios_apn_recorder[installationId].expire <= 0){
                 var msg = {"type": "collect_data"};
