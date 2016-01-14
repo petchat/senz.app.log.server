@@ -31,12 +31,23 @@ module.exports = function(Installation) {
                                         "deviceToken": uuid.v4()
                                     }, function(err, installation){
                                         logger.info(err, "Create New Installation: " + installation.id);
-                                        return cb(err, tracker);
+                                        return cb(err, {installationId: installation.id,
+                                                        userId: installation.userId});
                                     })
                                 });
                         }else{
                             logger.info(e, "Use The Exist Tracker!");
-                            return cb(e, tracker);
+                            Installation.create({
+                                "userId": tracker.id,
+                                "appId": appId,
+                                "hardwareId": hardwareId,
+                                "deviceType": deviceType,
+                                "deviceToken": uuid.v4()
+                            }, function(err, installation){
+                                logger.info(err, "Create New Installation: " + installation.id);
+                                return cb(err, {installationId: installation.id,
+                                    userId: installation.userId});
+                            })
                         }
                     })
             }
