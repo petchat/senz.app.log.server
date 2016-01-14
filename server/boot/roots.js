@@ -62,23 +62,21 @@ module.exports = function(server) {
 
                     var certpath = path.join(d.client.root, result.files.cert[0].container, result.files.cert[0].name);
                     var keypath = path.join(d.client.root, result.files.key[0].container, result.files.key[0].name);
-                    fs.readFile(certpath, function(e, cert){
-                        fs.readFile(keypath, function(e, key){
-                            server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
-                                if(err || !model){
-                                    return res.send({msg: "Invalid appId!"})
-                                }
-                                model.cert = cert;
-                                model.key = key;
-                                model.cert_pass = result.fields.pass[0];
-                                model.save(function(e, d){
-                                    if(e){
-                                        return res.send({msg: "upload failed!"});
-                                    }
-                                    return res.send({msg: "upload success!"}).end();
-                                })
-                            })
-                        });
+                    var cert = fs.readFileSync(certpath);
+                    var key = fs.readFileSync(keypath);
+                    server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
+                        if(err || !model){
+                            return res.send({msg: "Invalid appId!"})
+                        }
+                        model.cert = cert.toString();
+                        model.key = key.toString();
+                        model.cert_pass = result.fields.pass[0];
+                        model.save(function(e, d){
+                            if(e){
+                                return res.send({msg: "upload failed!"});
+                            }
+                            return res.send({msg: "upload success!"}).end();
+                        })
                     })
                 });
             });

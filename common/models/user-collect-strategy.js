@@ -9,7 +9,7 @@ var android_message_ref = new Wilddog(base_url + "/message/");
 module.exports = function(UserCollectStrategy) {
     var ios_apn_recorder = {};
     var android_wilddog_recorder = {};
-    var default_expire = 5;
+    var default_expire = 1;
 
     UserCollectStrategy.pushToken = function(req, cb) {
         var installationId = req.installationId;
@@ -238,8 +238,8 @@ module.exports = function(UserCollectStrategy) {
         });
     };
 
-    setInterval(maintainFlag, 10000);
-    setTimeout(connOnBoot, 0);
+    //setInterval(maintainFlag, 10000);
+    //setTimeout(connOnBoot, 0);
 
     UserCollectStrategy.remoteMethod(
         "pushToken",
