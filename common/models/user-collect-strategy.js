@@ -113,65 +113,46 @@ module.exports = function(UserCollectStrategy) {
         });
     };
 
-    var get_appid_by_installationid = function(installationId){
-        return UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}})
-            .then(
-                function(installation){
-                    if(!installation) return Promise.reject("Invalid InstallationId!");
-                    logger.debug("get_appid_by_installationid", installation.appId);
-                    return Promise.resolve(installation.appId);
-                })
-            .catch(function(e){
-                logger.error("get_appid_by_installationid", JSON.stringify(e));
-                return Promise.reject(e);
-            });
-    };
-
     var createApnConnection = function(installationId){
-        return get_appid_by_installationid(installationId)
-            .then(
-                function(appId){
-                    return Promise.all([UserCollectStrategy.findOne({where: {installationId: installationId}}),
-                                        UserCollectStrategy.app.models.senz_app.findOne({where: {id: appId}})])
-                })
-            .then(
-                function(result){
-                    var strategy = result[0];
-                    var senz_app = result[1];
-
-                    if(!strategy || !strategy.token || !senz_app || !senz_app.cert || !senz_app.key){
-                        return Promise.reject(result);
-                    }
-
-                    if(!strategy.device){
-                        strategy.device = new apn.Device(strategy.token);
-                    }
-
-                    strategy.expire = strategy.expire_init || default_expire;
-
-                    strategy.apnConnection_prod = new apn.Connection({
-                        cert: strategy.cert,
-                        key: strategy.key,
-                        production: true,
-                        passphrase: senz_app.cert_pass
+        UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}},
+            function(e, installation){
+                if(!e && installation){
+                    logger.debug("get_appid_by_installationid", installation.appId);
+                    console.log(installation.id);
+                    UserCollectStrategy.findOne({installationId: installation.id},
+                        function(e, strategy){
+                        if(e || !strategy || !strategy.token){
+                            logger.error("createApnConnection", "Can't create Apn Connection # Retry token");
+                            return null;
+                        }else{
+                            UserCollectStrategy.app.models.senz_app.findOne({where: {id: installation.appId}}, function(e, app){
+                                if(e || !app.cert || !app.key){
+                                    logger.error("createApnConnection", "Can't create Apn Connection # Retry upload Cert");
+                                }else{
+                                    strategy.device = new apn.Device(strategy.token);
+                                    strategy.expire = strategy.expire_init || default_expire;
+                                    strategy.apnConnection_prod = new apn.Connection({
+                                        cert: strategy.cert,
+                                        key: strategy.key,
+                                        production: true,
+                                        passphrase: app.cert_pass
+                                    });
+                                    strategy.apnConnection_dev = new apn.Connection({
+                                        cert: strategy.cert,
+                                        key: strategy.key,
+                                        production: false,
+                                        passphrase: app.cert_pass
+                                    });
+                                    strategy.save(function(){
+                                        ios_apn_recorder[installationId] = strategy;
+                                    });
+                                    logger.info("createConnection", "Create Connection Success!");
+                                }
+                            })
+                        }
                     });
-                    strategy.apnConnection_dev = new apn.Connection({
-                        cert: strategy.cert,
-                        key: strategy.key,
-                        production: false,
-                        passphrase: senz_app.cert_pass
-                    });
-
-                    strategy.save(function(e, d){
-                        ios_apn_recorder[installationId] = strategy;
-                    });
-
-                    logger.info("createConnection", "Create Connection Success!");
-                })
-            .catch(
-                function(e){
-                    return Promise.reject(e);
-                });
+                }
+            });
     };
 
     var pushApnMessage = function(installationId, msg){
@@ -239,6 +220,7 @@ module.exports = function(UserCollectStrategy) {
 
     var connOnBoot = function(){
         UserCollectStrategy.app.models.Installation.find({order: 'updatedAt DESC'}, function(e, installations){
+
             var remove_dup = {};
             installations.forEach(function(d){
                 if(!remove_dup[d.userId]){
