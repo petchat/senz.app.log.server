@@ -81,7 +81,6 @@ module.exports = function(UserCollectStrategy) {
                 strategy.expire_init = expire;
                 strategy.expire = expire;
                 strategy.save(function(e, d){
-                    console.log(d);
                     if(installation.deviceType == "ios"){
                         createApnConnection(installationId);
                     }else if(installation.deviceType == "android"){
