@@ -46,21 +46,17 @@ module.exports = function(server) {
         }
     });
 
-
     router.use('/uploadCert/:container', function(req, res){
         if(req.method == 'GET'){
             mkdir(path.join(__dirname, '../../storage', req.params.container));
-            return res.render("upload.html");
+            res.render("upload.html");
         }
 
         if(req.method == 'POST'){
             handler.upload(req, res, {getFilename: function(fileInfo, req, res){
-                console.log(fileInfo);
-                console.log(req.getFilename);
-                return "a";
+                return fileInfo.name;
             }}, function(err, result) {
                 if (err) return res.status(500).send(err);
-
                 handler.getFile(req.params.container, result.files.cert[0].name, function(e, d){
                     if(e) return res.send({msg: "upload failed!"});
 
@@ -70,7 +66,7 @@ module.exports = function(server) {
                     var key = fs.readFileSync(keypath);
                     server.models.senz_app.findOne({where: {id: result.fields.appId[0]}}, function(err, model){
                         if(err || !model){
-                            return res.send({msg: "Invalid appId!"})
+                            return res.send({msg: "Invalid appId!"}).end();
                         }
                         model.cert = cert.toString();
                         model.key = key.toString();
