@@ -11,7 +11,7 @@ var android_message_ref = new Wilddog(base_url + "/message/");
 module.exports = function(UserCollectStrategy) {
     var ios_apn_recorder = {};
     var android_wilddog_recorder = {};
-    var default_expire = 1;
+    var default_expire = 6;
 
     UserCollectStrategy.pushToken = function(req, cb) {
         var installationId = req.installationId;
