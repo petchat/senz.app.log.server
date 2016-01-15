@@ -49,7 +49,7 @@ module.exports = function(server) {
     router.use('/uploadCert/:container', function(req, res){
         if(req.method == 'GET'){
             mkdir(path.join(__dirname, '../../storage', req.params.container));
-            res.render("upload.html");
+            return res.render("upload.html");
         }
 
         if(req.method == 'POST'){
