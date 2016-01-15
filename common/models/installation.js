@@ -33,39 +33,6 @@ module.exports = function(Installation) {
                     return cb(err, {installationId: installation.id,
                         userId: installation.userId});
                 });
-
-                    //if(e || !tracker){
-                    //    Installation.app.models.Tracker.create({
-                    //        "username": hardwareId,
-                    //        "password": uuid.v4(),
-                    //        "email" : "nonexistence" + "@petchat.io"},
-                    //        function(e, tracker){
-                    //            Installation.create({
-                    //                "userId": tracker.id.toString(),
-                    //                "appId": appId,
-                    //                "hardwareId": hardwareId,
-                    //                "deviceType": deviceType,
-                    //                "deviceToken": uuid.v4()
-                    //            }, function(err, installation){
-                    //                logger.info(err, "Create New Installation: " + installation.id);
-                    //                return cb(err, {installationId: installation.id,
-                    //                                userId: installation.userId});
-                    //            })
-                    //        });
-                    //}else{
-                    //    logger.info(e, "Use The Exist Tracker!");
-                    //    Installation.create({
-                    //        "userId": tracker.id.toString(),
-                    //        "appId": appId,
-                    //        "hardwareId": hardwareId,
-                    //        "deviceType": deviceType,
-                    //        "deviceToken": uuid.v4()
-                    //    }, function(err, installation){
-                    //        logger.info(err, "Create New Installation: " + installation.id);
-                    //        return cb(err, {installationId: installation.id,
-                    //            userId: installation.userId});
-                    //    })
-                    //}
             })
         });
     };
