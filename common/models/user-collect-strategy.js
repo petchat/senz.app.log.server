@@ -100,7 +100,7 @@ module.exports = function(UserCollectStrategy) {
             }
 
             ios_apn_recorder[installationId] = {};
-            logger.debug("###############", installationId);
+            logger.debug("createApnConnection ## installationId", installationId);
 
             UserCollectStrategy.findOne({"installationId": installationId}, function(e, strategy){
                 if(e || !strategy || !strategy.token){
