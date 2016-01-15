@@ -1,6 +1,8 @@
 var log = require("../libraries/utils/logger").log;
 var logger = new log("<senz.app.log.server>");
 var apn = require("apn");
+var path = require("path");
+var fs = require('fs');
 var Wilddog = require("wilddog");
 var base_url = "https://notify.wilddogio.com/";
 var android_message_ref = new Wilddog(base_url + "/message/");
@@ -14,40 +16,30 @@ module.exports = function(UserCollectStrategy) {
     UserCollectStrategy.pushToken = function(req, cb) {
         var installationId = req.installationId;
         var token = req.token;
-        UserCollectStrategy.findOne({where: {installationId: installationId}}, function(e, strategy){
-            if(e || !strategy){
-                UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
-                    if(e || !installation){
-                        return cb(e, "Invalid installationId!");
-                    }else{
-                        UserCollectStrategy.create({
-                            installationId: installationId,
-                            expire_init: default_expire,
-                            expire: default_expire,
-                            deviceType: installation.deviceType,
-                            token: token
-                        }, function(e, d){
-                            if(installation.deviceType == "ios"){
-                                ios_apn_recorder[installationId] = d;
-                            }else if(installation.deviceType == "android"){
-                                android_wilddog_recorder[installationId] = d;
-                            }
-                            return cb(e, "Push Token Success!");
-                        })
-                    }
-                });
-            }else{
+        UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
+            if(e || !installation) return cb(e, "Invalid installationId!");
+
+            var data = {
+                installationId: installationId,
+                expire_init: default_expire,
+                expire: default_expire,
+                deviceType: installation.deviceType,
+                token: token
+            };
+            UserCollectStrategy.findOrCreate({where: {installationId: installationId}}, data, function(e, strategy){
+                if(e) return cb(e, "pushToken Failed!");
+
                 strategy.token = token;
                 strategy.save(function(e, d){
-                    if(e){
-                        return cb(e, "pushToken failed!");
-                    }else{
+                    if(installation.deviceType == "ios"){
                         createApnConnection(installationId);
-                        return cb("", "Push Token Success!");
+                    }else if(installation.deviceType == "android"){
+                        android_wilddog_recorder[installationId] = d;
                     }
+                    return cb(e, "pushToken Success!");
                 });
-            }
-        })
+            })
+        });
     };
 
     UserCollectStrategy.pushApnMessage = function(req, cb){
@@ -72,86 +64,79 @@ module.exports = function(UserCollectStrategy) {
 
     UserCollectStrategy.pushCollectStrategy= function(req, cb){
         var installationId = req.installationId;
-        if(!installationId){
-            return cb("", "InstallationId Must be NonEmpty!")
-        }
-        UserCollectStrategy.findOne({where: {installationId: installationId}}, function(e, collect_strategy){
-            if(e) return cb(e, "Invalid InstallationId!");
+        var expire = req.expire || default_expire;
 
-            if(!collect_strategy){
-                UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
-                    UserCollectStrategy.create({
-                        installationId: installationId,
-                        expire_init: req.expire,
-                        expire: req.expire,
-                        deviceType: installation.deviceType
-                    }, function(e, d){
-                        if(installation.deviceType == "ios"){
-                            ios_apn_recorder[installationId] = d;
-                        }else if(installation.deviceType == "android"){
-                            android_wilddog_recorder[installationId] = d;
-                        }
+        UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation) {
+            if (e || !installation) return cb(e, "Invalid installationId!");
 
-                        return cb(e, "Updated CollectStrategy");
-                    })
-                });
-            }else{
-                collect_strategy.expire_init = req.expire;
-                collect_strategy.expire = req.expire;
-                collect_strategy.save(function(e){
-                    if(e) return cb(e, "Update CollectStrategy Failed!");
+            var data = {
+                installationId: installationId,
+                expire_init: expire,
+                expire: expire,
+                deviceType: installation.deviceType
+            };
+            UserCollectStrategy.findOrCreate({where: {installationId: installationId}}, data, function(e, strategy){
+                if(e) return cb(e, "pushCollectStrategy Failed!");
 
-                    if(collect_strategy.deviceType == "ios"){
-                        ios_apn_recorder[installationId] = collect_strategy;
-                    }else if(collect_strategy.deviceType == "android"){
-                        android_wilddog_recorder[installationId] = collect_strategy;
+                strategy.expire_init = expire;
+                strategy.expire = expire;
+                strategy.save(function(e, d){
+                    console.log(d);
+                    if(installation.deviceType == "ios"){
+                        createApnConnection(installationId);
+                    }else if(installation.deviceType == "android"){
+                        android_wilddog_recorder[installationId] = d;
                     }
-
-                    return cb(e, "Update CollectStrategy Success!");
+                    return cb(e, "pushCollectStrategy Success!");
                 });
-            }
+            })
         });
     };
 
     var createApnConnection = function(installationId){
-        UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}},
-            function(e, installation){
-                if(!e && installation){
-                    logger.debug("createApnConnection", "appId: " + installation.appId);
-                    UserCollectStrategy.findOne({installationId: installation.id},
-                        function(e, strategy){
-                        if(e || !strategy || !strategy.token){
-                            logger.error("createApnConnection", "Can't create Apn Connection # Retry token");
-                            return null;
-                        }else{
-                            UserCollectStrategy.app.models.senz_app.findOne({where: {id: installation.appId}}, function(e, app){
-                                if(e || !app.cert || !app.key){
-                                    logger.error("createApnConnection", "Can't create Apn Connection # Retry upload Cert");
-                                }else{
-                                    strategy.device = new apn.Device(strategy.token);
-                                    strategy.expire = strategy.expire_init || default_expire;
-                                    strategy.apnConnection_prod = new apn.Connection({
-                                        cert: strategy.cert,
-                                        key: strategy.key,
-                                        production: true,
-                                        passphrase: app.cert_pass
-                                    });
-                                    strategy.apnConnection_dev = new apn.Connection({
-                                        cert: strategy.cert,
-                                        key: strategy.key,
-                                        production: false,
-                                        passphrase: app.cert_pass
-                                    });
-                                    strategy.save(function(){
-                                        ios_apn_recorder[installationId] = strategy;
-                                    });
-                                    logger.info("createConnection", "Create Connection Success!");
-                                }
-                            })
-                        }
-                    });
+        UserCollectStrategy.app.models.Installation.findOne({where: {id: installationId}}, function(e, installation){
+            if(e || !installation){
+                ios_apn_recorder[installationId] = {};
+                return null;
+            }
+
+            ios_apn_recorder[installationId] = {};
+            logger.debug("###############", installationId);
+
+            UserCollectStrategy.findOne({"installationId": installationId}, function(e, strategy){
+                if(e || !strategy || !strategy.token){
+                    logger.error("createApnConnection", "Can't create Apn Connection # Retry token");
+                    return null;
                 }
+
+                UserCollectStrategy.app.models.senz_app.findOne({where: {id: installation.appId}}, function(e, app){
+                    if(e || !app.cert || !app.key){
+                        logger.error("createApnConnection", "Can't create Apn Connection # Retry upload Cert");
+                        return null;
+                    }
+
+                    ios_apn_recorder[installationId].device = new apn.Device(strategy.token);
+                    ios_apn_recorder[installationId].expire_init = strategy.expire_init || default_expire;
+                    ios_apn_recorder[installationId].expire = strategy.expire_init || default_expire;
+
+                    var certPath = path.join(__dirname, '../../storage', installation.appId, "cert.pem");
+                    var keyPath = path.join(__dirname, '../../storage', installation.appId, "key.pem");
+
+                    ios_apn_recorder[installationId].apnConnection_prod = new apn.Connection({
+                        cert: fs.readFileSync(certPath),
+                        key: fs.readFileSync(keyPath),
+                        passphrase: app.cert_pass,
+                        production: true
+                    });
+                    ios_apn_recorder[installationId].apnConnection_dev = new apn.Connection({
+                        cert: fs.readFileSync(certPath),
+                        key: fs.readFileSync(keyPath),
+                        passphrase: app.cert_pass
+                    });
+                    logger.info("createConnection", "Create Connection Success!");
+                })
             });
+        });
     };
 
     var pushApnMessage = function(installationId, msg){
@@ -165,9 +150,7 @@ module.exports = function(UserCollectStrategy) {
 
         var note = new apn.Notification();
         note.contentAvailable = 1;
-        note.payload = {
-            "senz-sdk-notify": msg
-        };
+        note.payload = { "senz-sdk-notify": msg };
 
         if(apnConnection_dev && device){
             logger.debug("pushApnMessage_dev", JSON.stringify(note));
@@ -232,7 +215,7 @@ module.exports = function(UserCollectStrategy) {
                     android_wilddog_recorder[installation.id] = {};
                     android_wilddog_recorder[installation.id].expire = default_expire;
                 }else if(installation.deviceType == "ios"){
-                    createApnConnection(installation.id);
+                    createApnConnection(installation.id.toString());
                 }
             })
         });
